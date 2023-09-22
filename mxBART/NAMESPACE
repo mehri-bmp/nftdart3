@@ -1,2 +1,0 @@
-useDynLib(mxBART, .registration=TRUE)
-export("mxbart","mc.mxbart")

@@ -1,0 +1,73 @@
+
+Changes and New Features in 1.7 (2023-05-16):
+        * tsvs/tsvs2 now plot VIMP prob. rather than inclusion prob.  
+
+	* add bmx data set example
+
+	* calculate Restricted Mean Surival Time (RMST) via the new
+	argument RMST.max
+
+Changes and New Features in 1.6 (2023-04-29):
+        * C++14 is required for this package
+
+	* hard-wiring Windows Makevars for OpenMP
+
+	* auto-detection of OpenMP on macOS and Linux
+
+	* sampling from the posterior predictive for z
+
+	* resolve many C++ compiler warnings
+
+Changes and New Features in 1.5 (2023-01-06):
+        * streamlining the interface to nft2/nft/tsvs2/tsvs
+
+	* for code maintainability, nft is just a wrapper of nft2
+	  (and predict.nft is just a wrapper of predict.nft2)
+
+	* for non-FPD scenarios, calculate lower/upper just like FPD
+
+	* harden bMM for P=1 
+
+Changes and New Features in 1.4 (2022-08-25):
+	* New option: mask unstable sd(.) estimates to calculate soffset
+
+	* Use hardened DPM LIO variance prior setting
+
+	* Return both the LPML and the CPO
+
+	* add bMM (a la bartModelMatrix) to compute dummies/etc.
+
+        * predict produces draws from the predictive distribution of log t
+	  to facilitate C index calculations
+
+	* predict.aftree provided for producing survival/pdf/hazard
+	  function estimates (or their Friedman's partial dependence 
+          estimates if requested) for AFT BART like predict.nft does 
+	  for NFT BART
+          also draws from the predictive distribution of log t (as above)
+	
+	* experimental support for differing X matrices for f and sd
+	  see nft2 function
+
+	* Thompson Sampling Variable Selection functions
+	  tsvs for the same X matrix and tsvs2 for two different matrices
+
+	* new function bMM() to replace the deprecated bartModelMatrix()
+
+	* new function Cindex() to compute Harrell's C-index
+
+Changes and New Features in 1.3 (2022-03-26):
+	* Trap error code returned from rcat
+
+Changes and New Features in 1.2 (2022-02-01):
+	* Allow DPM LIO parameters to be altered for
+	  debugging/sensitivity analysis 
+
+	* Return inital AFT fit
+
+Changes and New Features in 1.1 (2021-12-17):
+	* Fix documentation bug 
+
+Changes and New Features in 1.0 (2021-12-16):
+	* First release after almost 3 years of testing
+

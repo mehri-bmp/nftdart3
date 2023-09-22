@@ -1,0 +1,71 @@
+aids.itr.pbart	   AIDS example for individualized treatment rules with probit BART
+aids.itr.lbart	   AIDS example for individualized treatment rules with logit BART
+alligator	   Alligator feeding example with mbart
+bladder.recur.bart	   Bladder cancer example for recurrent events with BART
+boston			   Boston housing data example with wbart
+c.surv.bart	   BART and the concordance probability
+cal.recur.bart	   Interval coverage calibration for recurrent events with BART
+concord.surv.bart  Concordance probability for survival analysis with BART
+cube.abart	   x-cubed example for log time with AFT BART
+cube.gbart	   x-cubed example for generic BART
+cube.hbart	   x-cubed example for heteroskedastic BART
+cube.gbmm 	   x-cubed example for the Generalized BART Mixed Model
+cube.pbart	   x-cubed example for binary outcomes with probit BART
+cube.lbart	   x-cubed example for binary outcomes with logit BART
+cube.mbart	   x-cubed example for binary outcomes with Multinomial BART
+data.recur.pre.bart	   Data construction for recurrent events with BART
+ex.mbart	   Example for multinomial BART
+exp.recur.bart	   Proportional intensity for recurrent events with BART
+friedman.wbart     Friedman's five dimensional test function and multi-threading with BART
+gator.mbart2	   Alligator feeding example with mbart2
+geweke.pbart1 	   Geweke diagnostics for binary outcomes with BART part 1
+geweke.pbart2 	   Geweke diagnostics for binary outcomes with BART part 2
+geweke.pbart3 	   Geweke diagnostics for binary outcomes with BART part 3
+geweke.recur.bart	   Geweke diagnostics for recurrent events with BART
+geweke.rs.pbart    Geweke diagnostics for binary outcomes with BART and random sampling
+geweke.surv.bart   Geweke diagnostics for survival analysis with BART
+geweke.lung.surv.bart   Geweke diagnostics for advanced lung cancer survival analysis with BART
+growth1			Growth chart example for variable selection
+growth2			Growth chart example for marginal effects assuming independence
+growth3			Growth chart example for marginal effects assuming dependence
+growth4			Growth chart example for marginal effects with FPD/FPDK/SHAP/SHAPK
+imputation         Imputing a categorical covariate variable with BART
+imputation.probit         Imputing a categorical covariate variable with probit BART
+inform.null.gbart  Specifying an informative null hypothesis prior with BART
+inform.alt.gbart   Specifying an informative alternative hypothesis prior with BART
+diabetes     	   Diabetes and hospital admission example for TSVS with BART
+dm.recur.bart	   Diabetes and hospital admission example for recurrent events with BART
+FPD  		   Marginal expecation via FPD
+FPDK  		   Marginal expecation comparison of FPD to FPDK
+SHAP  		   Marginal expecation comparison of FPD to SHAP and SHAPK
+SHAPT  		   Marginal expecation comparison of FPD to SHAP call=TRUE
+SHAPK  		   Marginal expecation comparison of FPD to SHAPK
+informative	   Example of sharding with an informative prior
+leuk		   Multi-state model example with leukemia data set
+liver.crisk.bart   Liver transplant example for competing risks with BART
+liver.crisk2.bart   Liver transplant example for competing risks with BART alternative
+liver.crisk2.mbart   Liver transplant example for competing risks with Multinomial BART
+liver.crisk3.bart   Liver transplant example for competing risks with BART for 3 causes
+liver50.crisk.bart   Liver transplant example setting K=50 for competing risks with BART
+lung.relrisk	   Lung cancer example for survival analysis with relative risks
+lung.surv.bart	   Lung cancer example for survival analysis with probit BART
+lung.surv.ice	   Lung cancer example for survival analysis: ICE-like S(t) plot
+lung.surv.lbart	   Lung cancer example for survival analysis with logit BART
+missing.gbart	   Example of missing imputation with gbart
+modlisa	   Example of using Modified LISA
+optimaldonor	   Hematopoietic stem cell transplantation optimal donor
+nhanes.pbart 	   Friedman's partial dependence function for binary outcomes with BART
+np.recur.bart	   Nonproportional intensity for recurrent events with BART
+nox		   Boston air pollution: Nitrogen Oxides and Housing Values
+replication	   Replication script for JSS article
+SHAP		   SHAP marginal expectation
+sigma.known.gbart	Sigma is fixed and known
+sparse.dart	   Dirichlet sparsity prior: categories vs. continuous
+sparse.lbart	   Dirichlet sparsity prior with logit BART
+sparse.pbart	   Dirichlet sparsity prior with probit BART
+sparse.wbart	   Dirichlet sparsity prior with continuous BART
+test.rtnorm	   Test truncated Normal sampler for probit/logit BART
+test.rtgamma	   Test truncated Gamma sampler for generalized mixed BART
+test.srstepwise	   Test stepwise implementation for survreg
+test.draw_lambda_i	   Test truncated Normal variance sampler for logit BART
+trees.pbart	   Concordant variable pairs probability with probit BART

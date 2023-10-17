@@ -23,32 +23,32 @@
  */
 
 /*
-#define ARNG
-#include "rn.h"
+#define ARNG             //creates a macro named "ARNG," but without a specific value
+#include "rn.h"          //Including additional custom or external libraries and headers: These are custom or external headers or libraries
 
-#include <iostream>
-#include <string>
-#include <ctime>
-#include <sstream>
+#include <iostream>      //Including necessary C++ standard libraries and headers: Used for input and output operations
+#include <string>        //Including necessary C++ standard libraries and headers: Provides string manipulation capabilities.
+#include <ctime>         //Including necessary C++ standard libraries and headers: Includes date and time-related functions.
+#include <sstream>       //Including necessary C++ standard libraries and headers: IUsed for string stream operations.
 
-#include <fstream>
-#include <vector>
+#include <fstream>       //Including file-related headers:Used for file input and output operations.
+#include <vector>        //Including the standard vector library: This library is used for creating and manipulating dynamic arrays.
 #include <limits>
 
-#include "ambrt.h"
-#include "psbrt.h"
-#include "brt.h"
-#include "brtfuns.h"
-#include "dinfo.h"
-#include "mbrt.h"
-#include "treefuns.h"
-#include "tree.h"
+#include "ambrt.h"       //Including additional custom or external libraries and headers: These are custom or external headers or libraries
+#include "psbrt.h"       //Including additional custom or external libraries and headers: These are custom or external headers or libraries
+#include "brt.h"         //Including additional custom or external libraries and headers: These are custom or external headers or libraries
+#include "brtfuns.h"     //Including additional custom or external libraries and headers: These are custom or external headers or libraries
+#include "dinfo.h"       //Including additional custom or external libraries and headers: These are custom or external headers or libraries
+#include "mbrt.h"        //Including additional custom or external libraries and headers: These are custom or external headers or libraries
+#include "treefuns.h"    //Including additional custom or external libraries and headers: These are custom or external headers or libraries
+#include "tree.h"        //Including additional custom or external libraries and headers: These are custom or external headers or libraries
 */
 
 //#include "rrn.h"
 //#include "rtnorm.h"
 
-RcppExport SEXP cnft2(
+RcppExport SEXP cnft2(   //function definition in the R programming language using Rcpp
 		     SEXP _ixftrain,
 		     SEXP _ixstrain,
 		     SEXP _iy, 		//train y

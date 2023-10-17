@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2012-2023 Rodney A. Sparapani
- *  
+ * Copyright (C) 2023 Mehri BagheriMohmadiPour (ONLY FOR THE LINES MARKED AS "Mehri B.M.P.")
  * This file is part of nftbart.
  * cnft2.h
  *
@@ -17,9 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Author contact information
+ * Authors contact information
  * Rodney A. Sparapani: rsparapa@mcw.edu
- *
+ * Mehri BagheriMohamadiPour: mehri@uwm.edu
  */
 
 /*

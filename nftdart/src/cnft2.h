@@ -29,7 +29,7 @@
 #include <iostream>      //Including necessary C++ standard libraries and headers: Used for input and output operations
 #include <string>        //Including necessary C++ standard libraries and headers: Provides string manipulation capabilities.
 #include <ctime>         //Including necessary C++ standard libraries and headers: Includes date and time-related functions.
-#include <sstream>       //Including necessary C++ standard libraries and headers: IUsed for string stream operations.
+#include <sstream>       //Including necessary C++ standard libraries and headers: Used for string stream operations.
 
 #include <fstream>       //Including file-related headers:Used for file input and output operations.
 #include <vector>        //Including the standard vector library: This library is used for creating and manipulating dynamic arrays.
@@ -88,32 +88,45 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
 		     SEXP _phi,
 		     SEXP _prior,
 		     //SEXP _idraws,
-		     SEXP _idrawMuTau
+		     SEXP _idrawMuTau,
 		     //SEXP _iedraws2,
 		     //SEXP _izdraws2
 		     //SEXP _impute_bin, 
-		     //SEXP _impute_prior 
+		     //SEXP _impute_prior,
+            //Mehri B.M.P. addiding dart extension, line 97~105.
+             SEXP _idart,         //Mehri B.M.P., dart prior: true(1)=yes, false(0)=no
+             SEXP _itheta,        //Mehri B.M.P.
+             SEXP _iomega,        //Mehri B.M.P.
+             SEXP _igrp,          //Mehri B.M.P.
+             SEXP _ia,            //Mehri B.M.P., param a for sparsity prior
+             SEXP _ib,            //Mehri B.M.P., param b for sparsity prior
+             SEXP _irho,          //Mehri B.M.P., param rho for sparsity prior (default to p)
+             SEXP _iaug,          //Mehri B.M.P., categorical strategy: true(1)=data augment false(0)=degenerate trees
+             SEXP _varprob
 		     )
+//  //Mehri B.M.P.,matrix to return dart posteriors (counts and probs)
+//std::vector< std::vector<size_t> > varcnt; //Mehri B.M.P.
+//std::vector< std::vector<double> > varprb; //Mehri B.M.P.
 {
   //random number generation
 
-#if defined(RRNG)
-  GetRNGstate();
+#if defined(RRNG)   // These lines suggest conditional compilation based on whether RRNG is defined
+  GetRNGstate();    //If RRNG is defined, the code will interact with R's random number generator. GetRNGstate() is a function in R that is used to set the random number generator's state to a known state. This is often done to ensure reproducibility in random number generation.
 #endif
 
-  rrn gen;
+  rrn gen; //Declare an object gen of a custom class rrn. A custom random number generator.
 
   //--------------------------------------------------
-  //process args
+  //process args. Initializes numeric matrices Xt_ftrain and Xt_strain using certain indices. And it calculates the dimensions and pointers for these matrices.
   Rcpp::NumericMatrix Xt_ftrain(_ixftrain), Xt_strain(_ixstrain);
   size_t pf = Xt_ftrain.nrow(),  ps = Xt_strain.nrow(), n = Xt_ftrain.ncol();
   double *xftrain = &Xt_ftrain[0], *xstrain = &Xt_strain[0];
 
-  //x out-of-sample
+  //x out-of-sample. Handles out-of-sample data with matrices Xt_ftest and Xt_stest.
   Rcpp::NumericMatrix Xt_ftest(_ixftest), Xt_stest(_ixstest);
   size_t np = Xt_ftest.ncol();
   double *xftest = nullptr, *xstest = nullptr;
-  if(np) {
+  if(np) { //It checks whether there is out-of-sample data (indicated by np) and, if so, initializes pointers to this data.
     xftest = &Xt_ftest[0];
     xstest = &Xt_stest[0];
   }
@@ -123,12 +136,13 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
   Rcpp::NumericVector impute_prior(_impute_prior); 
   double impute_post0, impute_post1, *impute_Xrow_ptr = 0;
 */
+  // Using the Rcpp library, to integrate R and C++ code.
   //y
-  Rcpp::NumericVector yv(_iy);
-  double *y = &yv[0];//, ymax=Rcpp::max(yv);
+  Rcpp::NumericVector yv(_iy); //yv is Rcpp numeric vectors.
+  double *y = &yv[0];   //y is pointer to the data, ymax=Rcpp::max(yv);
 
   //delta
-  Rcpp::IntegerVector delta(_idelta), censor(n);
+  Rcpp::IntegerVector delta(_idelta), censor(n); //delta and censor are Rcpp numeric vectors.
 /*
   Rcpp::NumericVector deltav(_idelta);
   double *delta = &deltav[0];
@@ -139,24 +153,24 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
   //size_t K=events.size();
 
   //z and w and e
-  Rcpp::NumericVector zv(n), wv(n); //e(n);
-  double *z = &zv[0], *w = &wv[0];
+  Rcpp::NumericVector zv(n), wv(n); //zv, and wv are Rcpp numeric vectors, e(n);
+  double *z = &zv[0], *w = &wv[0];  //z, and w are pointers to the data in the respective vectors.
 
-  //number of trees
+  //number of trees, im is an Rcpp integer vector containing two values, representing the number of trees (m) and a second value (mh).
   Rcpp::IntegerVector im(_im);
   size_t m = im[0], mh = im[1];
 
-  //mu prior (tau, ambrt) and sigma prior (lambda,nu, psbrt)
+  //mu prior (tau, ambrt) and sigma prior (lambda,nu, psbrt),tau, overalllambda, and overallnu are doubles used as parameters for prior distributions.opm is calculated as 1.0 divided by mh. lambda are computed based on the values of overalllambda.
   double tau = Rcpp::as<double>(_itau);
   double overalllambda = Rcpp::as<double>(_ioveralllambda);
   double overallnu = Rcpp::as<double>(_ioverallnu);
 
   double opm=1.0/((double)mh);
   //double nu=2.0*pow(overallnu,opm)/(pow(overallnu,opm)-pow(overallnu-2.0,opm));
-double nu=2./(1.-pow(1.-2/overallnu, opm));
+  double nu=2./(1.-pow(1.-2/overallnu, opm));
   double lambda=pow(overalllambda,opm);
 
-  //nd and burn
+  //nd and burn, nd, burn, nadapt, and adaptevery are variables used for control and configuration.
   size_t nd = Rcpp::as<int>(_ind);
   size_t burn = Rcpp::as<int>(_iburn);
   size_t nadapt = Rcpp::as<int>(_inadapt);
@@ -207,7 +221,7 @@ double nu=2./(1.-pow(1.-2/overallnu, opm));
   //thread count
   int tc = Rcpp::as<int>(_itc);
 
-  //sigma vector
+  //sigma vector, sigmav is an Rcpp numeric vector, and sig is a pointer to its data.
   Rcpp::NumericVector sigmav(n); //sigmav(_isigmav);
   double *sig = &sigmav[0];
   dinfo disig;
@@ -231,7 +245,7 @@ double nu=2./(1.-pow(1.-2/overallnu, opm));
     for(int j=0;j<chvs.ncol();j++) chgvs[i][j]=chvs(i,j);
   }
 
-  //control
+  //control, Various control parameters such as printevery, pbd, pb, stepwpert, stepwperth, probchv, and minnumbot are set.
   size_t printevery = Rcpp::as<int>(_iprintevery);
   Rcpp::NumericVector ipbd(_ipbd), ipb(_ipb), istepwpert(_istepwpert),
     iprobchv(_iprobchv);
@@ -244,7 +258,7 @@ double nu=2./(1.-pow(1.-2/overallnu, opm));
   if(probchv<0) dopert=false;
   if(probchvh<0) doperth=false;
 
-  //summary statistics yes/no
+  //summary statistics yes/no, summarystats is a boolean indicating whether to calculate summary statistics.
   bool summarystats = true; //Rcpp::as<bool>(_isummarystats);
 
   //error variance prior
@@ -252,7 +266,7 @@ double nu=2./(1.-pow(1.-2/overallnu, opm));
   double betao = Rcpp::as<double>(_ibetao);
   double lambdao=betao/alphao, nuo=2.*alphao;*/
 
-  // DPM LIO
+  // DPM LIO, Variables like C, states, phi, prior, hyper, and constrain are part of a Dirichlet Process Mixture model.
   Rcpp::IntegerVector C(_C), states(_states);
   Rcpp::NumericMatrix phi(_phi);
   Rcpp::List prior(_prior), hyper(_hyper);
@@ -261,8 +275,26 @@ double nu=2./(1.-pow(1.-2/overallnu, opm));
 
   //double alpha=Rcpp::as<double>(hyper["alpha"]); // inital value
   Rcpp::NumericMatrix Y(n, 1);
-
-  // return data structures
+  
+  //Mehri B.M.P. addiding dart extension, line 277~292.
+  bool dart;  //Mehri B.M.P.
+  if(Rcpp::as<int>(_idart)==1) dart=true; //Mehri B.M.P.
+  else dart=false; //Mehri B.M.P.
+  double a = Rcpp::as<double>(_ia); //Mehri B.M.P.
+  double b = Rcpp::as<double>(_ib); //Mehri B.M.P.
+  //   Rcpp::NumericVector irho(_irho); //Mehri B.M.P.
+  //   double *rho = &irho[0]; //Mehri B.M.P.
+  double rho = Rcpp::as<double>(_irho); //Mehri B.M.P.
+  bool aug; //Mehri B.M.P.
+  if(Rcpp::as<int>(_iaug)==1) aug=true; //Mehri B.M.P.
+  else aug=false; //Mehri B.M.P.
+  Rcpp::NumericVector varprob(_varprob); //Mehri B.M.P.
+  double theta = Rcpp::as<double>(_itheta); //Mehri B.M.P.
+  double omega = Rcpp::as<double>(_iomega); //Mehri B.M.P.
+  Rcpp::IntegerVector _grp(_igrp); //Mehri B.M.P.
+  int *grp = &_grp[0]; //Mehri B.M.P.
+    
+  // return data structures, Variables for storing the results, such as dalpha, dnpart, dmu, dsig, dpC, dpMU, and dpSD, are defined.
   int ndMT=0, ndbMT=0, nMT=0;
   if(drawMuTau>0) {
     ndMT=nd;
@@ -280,7 +312,7 @@ double nu=2./(1.-pow(1.-2/overallnu, opm));
   //Rcpp::NumericMatrix dpWT(ndMT, nMT);
 
   //--------------------------------------------------
-  //print args
+  //print args, //Using Rprintf and COUT (from R or C++ libraries) to print various information to the console. It prints the values of n, pf, ps, xftrain, xstrain, y, np, xftest, xstest, information related to tree models and probabilities, information about alpha values and draw constraintsand more. Format specifiers %ld used for long integers, %lf for double-precision floating-point numbers, and %d for integers.
   //  Rprintf("**********************\n");
   Rprintf("n: %ld\n",n);
   Rprintf("pf, ps: %ld, %ld\n",pf, ps);
@@ -361,29 +393,35 @@ double nu=2./(1.-pow(1.-2/overallnu, opm));
   }
 */
   Rprintf("printevery: %d\n",printevery);
+    
+  //Mehri B.M.P. addiding dart extension, line 398~400.
+  cout << "*****Dirichlet:sparse,theta,omega,rho,a,b,augment,grp[0],grp[p-1]:\n"
+         << dart << ',' << theta << ',' << omega << ',' << rho << ',' << a << ',' //Mehri B.M.P.
+         << b << ',' << aug << ',' << grp[0] << ',' << grp[p-1] << endl; //Mehri B.M.P.
+    
 
   //--------------------------------------------------
-  //make xinfo
+  //make xinfo. Initializing xinfo and Rcpp::List objects ixif and ixis using the inputs _ixifcuts and _ixiscuts.
   xinfo xif, xis;
   Rcpp::List ixif(_ixifcuts), ixis(_ixiscuts);
-  if(ixif.length()!= (int)pf || ixis.length()!= (int)ps) {
+  if(ixif.length()!= (int)pf || ixis.length()!= (int)ps) { //Data Validation: It checks if the lengths of ixif and ixis match the expected values pf and ps. If not, it prints an error message using Rprintf and returns 0.
     Rprintf("Cutpoint definition does not match number of predictor variables!\n");
     return 0;
   }
-  xif.resize(pf);
+  xif.resize(pf); //Data Extraction: It extracts data from ixif into xif and also prints some information about the data using COUT.
   for(size_t i=0;i<pf;i++) xif[i]=Rcpp::as< std::vector<double> >(ixif[i]);
   for(size_t i=0;i<pf;i++) {
       COUT << "f variable " << i << " has numcuts=" << xif[i].size() << " : ";
       COUT << xif[i][0] << " ... " << xif[i][xif[i].size()-1] << endl;
     }
-  xis.resize(ps);
+  xis.resize(ps); //Data Extraction: It extracts data from ixis into xis and also prints some information about the data using COUT.
   for(size_t i=0;i<ps;i++) xis[i]=Rcpp::as< std::vector<double> >(ixis[i]);
   for(size_t i=0;i<ps;i++) {
       COUT << "s variable " << i << " has numcuts=" << xis[i].size() << " : ";
       COUT << xis[i][0] << " ... " << xis[i][xis[i].size()-1] << endl;
     }
 
-  for(size_t i=0;i<n;i++) {
+  for(size_t i=0;i<n;i++) { //Initialization of Variables: It initializes various variables like z, w, and censor.
     z[i]=y[i]; // initialize z
     w[i]=1.;   // initialize w
     censor[i] = 1-delta[i]; // -1 left, 0 event, 1 right
@@ -395,11 +433,11 @@ double nu=2./(1.-pow(1.-2/overallnu, opm));
   }
 
   //--------------------------------------------------
-  //dinfo
+  //dinfo, dinfo Object Creation: A dinfo object di is created and initialized with relevant data.
   dinfo di;
   di.n=n; di.p=pf; di.x = xftrain; di.y = z; di.tc=tc;
   //--------------------------------------------------
-  // set up ambrt object
+  // set up ambrt object, ambrt Object Setup: An ambrt object ambm is set up. This object is related to BART modeling. It's configured with cutpoints, data, thread count, tree prior parameters, and MCMC information.
   ambrt ambm(m);
 
   //cutpoints
@@ -423,10 +461,23 @@ double nu=2./(1.-pow(1.-2/overallnu, opm));
 	     &chgvf  //initialize the change of variable correlation matrix.
 	     );
   ambm.setci(tau,sig);
+ 
+  //Mehri B.M.P. addiding dart extension, line 466~478.
+  bm.setdart(a,b,grp,aug,dart,rho); //Mehri B.M.P
+  //bm.setdart(a,b,rho,aug,dart); //Mehri B.M.P
+  bm.setpv(&varprob[0]); //Mehri B.M.P
 
-
+  // dart iterations, //Mehri B.M.P
+  std::vector<double> ivarprb (p,0.); //Mehri B.M.P
+  std::vector<size_t> ivarcnt (p,0); //Mehri B.M.P
+  ivarprb=bm.getpv(); //Mehri B.M.P
+       if(verbose==1) { //Mehri B.M.P
+     cout << "*****Variable selection probability pv[0],pv[p-1]:\n" //Mehri B.M.P
+         << ivarprb[0] << ',' << ivarprb[p-1] << endl; //Mehri B.M.P
+     printf("\nMCMC\n"); //Mehri B.M.P
+       } //Mehri B.M.P
   //--------------------------------------------------
-  //setup psbrt object
+  //setup psbrt object, psbrt Object Setup: A psbrt object psbm is set up. It is related to posterior sampling for BART. It's configured with cutpoints, data, thread count, tree prior parameters, and MCMC information.
   psbrt psbm(mh,overalllambda);
 
   //make di for psbrt object
@@ -457,13 +508,13 @@ double nu=2./(1.-pow(1.-2/overallnu, opm));
 	     );
   psbm.setci(nu,lambda);
 
-  // x.test predictions
+  // x.test predictions, x.test Predictions: Predictions are made on test data and stored in _f and _s
   double *_f = new double[np], *_s = new double[np];
   dinfo f, s;
   f.x = xftest; f.y=_f; f.p = pf; f.n=np; f.tc=tc;
   s.x = xstest; s.y=_s; s.p = ps; s.n=np; s.tc=tc;
 
-  // DPM LIO
+  // DPM LIO, DPM LIO: It is some operation involving a Dirichlet process mixture model (DPM). Parameters are calculated for mvec and svec based on phi.
   double *mvec = new double[n];
   double *svec = new double[n];
   //Rcpp::NumericVector mvec(n), svec(n);
@@ -472,7 +523,8 @@ double nu=2./(1.-pow(1.-2/overallnu, opm));
     svec[i]=pow(phi(0, 1), -0.5);
   }
   //--------------------------------------------------
-  //run mcmc
+  //run mcmc. Implements MCMC sampling
+  //Variable Declarations: Declaring several std::vector objects to store various data, parameters, and intermediate results. These vectors have different dimensions and are used to hold information about the MCMC sampling process.
   std::vector<int> onn(nd*m,1);
   std::vector<std::vector<int> > oid(nd*m, std::vector<int>(1));
   std::vector<std::vector<int> > ovar(nd*m, std::vector<int>(1));
@@ -497,13 +549,13 @@ double nu=2./(1.-pow(1.-2/overallnu, opm));
 */
 
   Rprintf("Starting MCMC...\n");
-
+  //Initialization: Some variables like adapting, burning, keeping, and drawDP are initialized. These variables control different phases of the MCMC algorithm, such as adaptation, burning, and data imputation.
   bool adapting=true, burning=false, keeping=false, adapting_every, drawDP=false;
 //, draw_s=true; 
 #ifdef PROFILER 
   ProfilerStart(PROFILER);
 #endif
-
+  //MCMC Loop: The core of the MCMC algorithm is in the for loop, which runs for a specified number of iterations (M). Inside the loop, the code performs different operations depending on whether it's in the adaptation phase, burning phase, or keeping phase. The code also handles data imputation, including censoring and random draws. Updating Parameters: The code updates various parameters such as z[k], sig[k], mvec[k], and phi(C[k], 0) based on the current state and the MCMC sampling process. These parameters are essential for Bayesian inference. MCMC Sampling: The code uses random number generation functions (e.g., gen.normal) to sample from probability distributions. This is a fundamental aspect of MCMC, where random samples are drawn to estimate posterior distributions. Data Imputation: The code appears to be imputing data or estimating missing values. This is a common task in Bayesian analysis, where incomplete data is estimated using the observed data and the model.Constraining Parameters: There's a section that seems to constrain parameters, which is often done in Bayesian analysis to ensure certain properties or priors on parameters. Updating Count of Partitions: The code updates the count of partitions (dnpart[h]), which could be related to the number of clusters or groups in the data. Other Operations: The code includes some commented-out sections that might be part of the larger program but are currently inactive.
   for(size_t h, i=0, j, L=nadapt+burn, M=L+nd; i<M; i++) {
     adapting=(i<nadapt);
     h=i-nadapt;
@@ -526,6 +578,8 @@ double nu=2./(1.-pow(1.-2/overallnu, opm));
 	  psbm.setstats(true);
 	}
       }
+        
+    if(i==(burn/2)&&dart) bm.startdart(); //Mehri B.M.P. addiding dart extension
     } 
     else adapting_every=(i>0 && (i%adaptevery)==0);
 
@@ -768,20 +822,21 @@ double nu=2./(1.-pow(1.-2/overallnu, opm));
     } 
   }
 
-#ifdef PROFILER
+#ifdef PROFILER  // Some conditional preprocessor directives, such as checking for the presence of the PROFILER macro and using ProfilerStop() if it's defined.
   ProfilerStop();
 #endif
 
+  //Two std::stringstream objects, mtrees and strees, are declared.
   std::stringstream mtrees, strees;  
-  mtrees=ambm.gettrees(nd,m,onn,oid,ovar,oc,otheta,0.);
+  mtrees=ambm.gettrees(nd,m,onn,oid,ovar,oc,otheta,0.); //The ambm.gettrees function is called with various parameters, and the result is assigned to mtrees.
   //if(draws) 
-  strees=psbm.gettrees(nd,mh,snn,sid,svar,sc,stheta,-1.);
+  strees=psbm.gettrees(nd,mh,snn,sid,svar,sc,stheta,-1.); //psbm.gettrees is called and assigned to strees.
 
   /*
     Flatten posterior trees to a few XXL vectors so we can just pass pointers
     to these vectors back to R (which is much faster than copying all the data back)
   */
-
+  //The code then flattens posterior trees into several vectors, such as e_ots, e_oid, e_ovar, e_oc, and e_otheta. These vectors are filled with data from the input vectors oid, ovar, oc, and otheta.
   std::vector<int>* e_ots=new std::vector<int>(nd*m);
   std::vector<int>* e_oid=new std::vector<int>;
   std::vector<int>* e_ovar=new std::vector<int>;
@@ -795,13 +850,14 @@ double nu=2./(1.-pow(1.-2/overallnu, opm));
       e_oc->insert(e_oc->end(),oc[i*m+j].begin(),oc[i*m+j].end());
       e_otheta->insert(e_otheta->end(),otheta[i*m+j].begin(),otheta[i*m+j].end());
     }
+  //The code creates Rcpp::XPtr objects for the vectors created in the previous step. These are used for interfacing with R.
   Rcpp::XPtr< std::vector<int> > extern_ots(e_ots,true);
   Rcpp::XPtr< std::vector<int> > extern_oid(e_oid,true);
   Rcpp::XPtr< std::vector<int> > extern_ovar(e_ovar,true);
   Rcpp::XPtr< std::vector<int> > extern_oc(e_oc,true);
   Rcpp::XPtr< std::vector<double> > extern_otheta(e_otheta,true);
 
-  Rcpp::List ret = Rcpp::List::create(
+  Rcpp::List ret = Rcpp::List::create( //A Rcpp::List object named ret is created. It contains several named elements, including "ots," "oid," "ovar," "oc," and "otheta," which correspond to the vectors and XPtrs created earlier. There are also other elements like "f.train" and "f.trees."
 				      Rcpp::Named("ots")=extern_ots,
 				      Rcpp::Named("oid")=extern_oid,
 				      Rcpp::Named("ovar")=extern_ovar,
@@ -817,7 +873,7 @@ double nu=2./(1.-pow(1.-2/overallnu, opm));
 				      Rcpp::Named("f.train")=mdraws,
 				      Rcpp::Named("f.trees")=Rcpp::CharacterVector(mtrees.str()));
 
-  //if(draws) 
+  //if(draws) , A conditional block that deals with more data and vectors if certain conditions are met. If draws is true, it creates additional vectors and adds them to the ret list.
   {
     std::vector<int>* e_sts=new std::vector<int>(nd*mh);
     std::vector<int>* e_sid=new std::vector<int>;
@@ -849,7 +905,7 @@ double nu=2./(1.-pow(1.-2/overallnu, opm));
   }
 //  else if(drawMuTau==0) ret["sigma"]=sddraws;
 
-  if(drawMuTau>0) {
+  if(drawMuTau>0) { //Another conditional block is used to populate the ret list with more elements if drawMuTau is greater than 0.
     ret["dpalpha"]=dalpha;
     ret["dpn"]=dnpart;
     ret["dpmu"]=dmu;
@@ -860,13 +916,13 @@ double nu=2./(1.-pow(1.-2/overallnu, opm));
     //ret["dpwt."]=dpWT;
   }
 
-  if(np) {
+  if(np) { //If np is true, it adds elements related to "f.test" and "s.test" to the ret list.
     ret["f.test"]=mpred;
     //if(draws) 
     ret["s.test"]=spred;
   }
 
-  ret["z.train"]=zdraws;
+  ret["z.train"]=zdraws; //The z.train element is added to the ret list.
   //ret["e.train"]=edraws;
   //if(drawrho) ret["rho"]=rhodraws;
 
@@ -882,7 +938,7 @@ double nu=2./(1.-pow(1.-2/overallnu, opm));
     double tavgd=0.0;
 */
 
-    ambm.getstats(&fvarcount[0],&tavgd,&tmaxd,&tmind);
+    ambm.getstats(&fvarcount[0],&tavgd,&tmaxd,&tmind); //A section related to summary statistics calculates various values and adds them to the ret list. The exact calculations involve statistics and vectors like fvarcount, tavgd, tmaxd, and tmind.
     tavgd/=(double)(nd*m);
     ret["f.tavgd"]=tavgd;
     ret["f.tmaxd"]=tmaxd;
@@ -912,10 +968,11 @@ double nu=2./(1.-pow(1.-2/overallnu, opm));
     }
   }
 
-#if defined(RRNG)
+#if defined(RRNG) //The code checks if RRNG is defined and includes some related operations.
   PutRNGstate();
 #endif
-
+ 
+  // The code deallocates memory for several dynamically allocated arrays using delete.
   if(_f) delete [] _f;
   if(_s) delete [] _s;
   if(r) delete [] r;
@@ -923,7 +980,7 @@ double nu=2./(1.-pow(1.-2/overallnu, opm));
   if(mvec) delete [] mvec;
   if(svec) delete [] svec;
 
-  return ret;
+  return ret; // It returns the ret list.
 }
 
 

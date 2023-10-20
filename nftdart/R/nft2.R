@@ -62,7 +62,7 @@ nft2 = function(## data
                ## Mehri B.M.P., add dart extension
                sparse=FALSE, theta=0, omega=1, ##Mehri B.M.P.
                a=0.5, b=1, augment=FALSE, rho=0, grp=NULL, ## Mehri B.M.P.
-               varprob=NULL // Mehri B.M.P.
+               varprob=NULL ## Mehri B.M.P.
                )
 {
     n=length(times)

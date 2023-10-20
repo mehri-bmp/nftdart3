@@ -397,7 +397,7 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
   //Mehri B.M.P. addiding dart extension, line 398~400.
   cout << "*****Dirichlet:sparse,theta,omega,rho,a,b,augment,grp[0],grp[p-1]:\n"
          << dart << ',' << theta << ',' << omega << ',' << rho << ',' << a << ',' //Mehri B.M.P.
-         << b << ',' << aug << ',' << grp[0] << ',' << grp[p-1] << endl; //Mehri B.M.P.
+         << b << ',' << aug << ',' << grp[0] << ',' << grp[pf-1] << endl; //Mehri B.M.P.
     
 
   //--------------------------------------------------
@@ -463,19 +463,19 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
   ambm.setci(tau,sig);
  
   //Mehri B.M.P. addiding dart extension, line 466~478.
-  bm.setdart(a,b,grp,aug,dart,rho); //Mehri B.M.P
+  ambm.setdart(a,b,grp,aug,dart,rho); //Mehri B.M.P
   //bm.setdart(a,b,rho,aug,dart); //Mehri B.M.P
-  bm.setpv(&varprob[0]); //Mehri B.M.P
+  ambm.setpv(&varprob[0]); //Mehri B.M.P
 
   // dart iterations, //Mehri B.M.P
-  std::vector<double> ivarprb (p,0.); //Mehri B.M.P
-  std::vector<size_t> ivarcnt (p,0); //Mehri B.M.P
-  ivarprb=bm.getpv(); //Mehri B.M.P
-       if(verbose==1) { //Mehri B.M.P
-     cout << "*****Variable selection probability pv[0],pv[p-1]:\n" //Mehri B.M.P
-         << ivarprb[0] << ',' << ivarprb[p-1] << endl; //Mehri B.M.P
-     printf("\nMCMC\n"); //Mehri B.M.P
-       } //Mehri B.M.P
+  std::vector<double> ivarprb (pf,0.); //Mehri B.M.P
+  std::vector<size_t> ivarcnt (pf,0); //Mehri B.M.P
+  ivarprb=ambm.getpv(); //Mehri B.M.P
+//       if(verbose==1) { //Mehri B.M.P
+//     cout << "*****Variable selection probability pv[0],pv[p-1]:\n" //Mehri B.M.P
+//         << ivarprb[0] << ',' << ivarprb[pf-1] << endl; //Mehri B.M.P
+//     printf("\nMCMC\n"); //Mehri B.M.P
+//       } //Mehri B.M.P
   //--------------------------------------------------
   //setup psbrt object, psbrt Object Setup: A psbrt object psbm is set up. It is related to posterior sampling for BART. It's configured with cutpoints, data, thread count, tree prior parameters, and MCMC information.
   psbrt psbm(mh,overalllambda);
@@ -579,7 +579,7 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
 	}
       }
         
-    if(i==(burn/2)&&dart) bm.startdart(); //Mehri B.M.P. addiding dart extension
+    if(i==(burn/2)&&dart) ambm.startdart(); //Mehri B.M.P. addiding dart extension
     } 
     else adapting_every=(i>0 && (i%adaptevery)==0);
 

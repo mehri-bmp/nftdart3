@@ -1,5 +1,5 @@
 ## Copyright (C) 2022 Rodney A. Sparapani
-## Copyright (C) 2023 Mehri Bagheri-Mohmadi-Pour (ONLY FOR THE LINES MARKED AS "Mehri B.M.P.")
+## Copyright (C) 2023 Mehri Bagheri-Mohamadi-Pour (ONLY FOR THE LINES MARKED AS "Mehri B.M.P.")
 
 ## This file is part of nftbart.
 ## nft2.R
@@ -19,9 +19,9 @@
 
 ## Authors contact information
 ## Rodney A. Sparapani: rsparapa@mcw.edu
-## Mehri Bagheri-Mohmadi-Pour: mehri@uwm.edu
+## Mehri Bagheri-Mohamadi-Pour: mehri@uwm.edu
 
-nft2 = function(## data
+nft2 = function(## data, Function Parameters: The function nft2 takes a multitude of input parameters, including data matrices (xftrain, xstrain, xftest, xstest, etc.), various options related to data manipulation, model settings, and hyperparameters.
                xftrain, xstrain, times, delta=NULL, 
                xftest=matrix(nrow=0, ncol=0),
                xstest=matrix(nrow=0, ncol=0),
@@ -252,7 +252,6 @@ nft2 = function(## data
               ##zdraws2,
               ##impute.bin,
               ##impute.prob,
-              PACKAGE="nftbart",
               ## Mehri B.M.P., add dart extension
               sparse, ## Mehri B.M.P.
               theta, ## Mehri B.M.P.
@@ -262,7 +261,8 @@ nft2 = function(## data
               b, ## Mehri B.M.P.
               rho, ## Mehri B.M.P.
               augment,## Mehri B.M.P.
-              varprob) ## Mehri B.M.P.
+              varprob, ## Mehri B.M.P.
+              PACKAGE="nftbart")
 
     ## res$elapsed <- (proc.time()-ptm)['elapsed']
     ## attr(res$elapsed, 'names')=NULL

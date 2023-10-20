@@ -24,7 +24,7 @@ static const R_CallMethodDef CallEntries[] = { //The R_CallMethodDef structure i
 //    {"cprnft",           (DL_FUNC) &cprnft,            4},
     {"cprnft2",          (DL_FUNC) &cprnft2,           6},
 //    {"cnft",             (DL_FUNC) &cnft,             32},
-    {"cnft2",            (DL_FUNC) &cnft2,            33},
+    {"cnft2",            (DL_FUNC) &cnft2,            42}, //Mehri B.M.P.
     {NULL, NULL, 0}
 };
 

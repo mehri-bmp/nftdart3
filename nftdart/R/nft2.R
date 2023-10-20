@@ -1,4 +1,5 @@
 ## Copyright (C) 2022 Rodney A. Sparapani
+## Copyright (C) 2023 Mehri Bagheri-Mohmadi-Pour (ONLY FOR THE LINES MARKED AS "Mehri B.M.P.")
 
 ## This file is part of nftbart.
 ## nft2.R
@@ -16,8 +17,9 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-## Author contact information
+## Authors contact information
 ## Rodney A. Sparapani: rsparapa@mcw.edu
+## Mehri Bagheri-Mohmadi-Pour: mehri@uwm.edu
 
 nft2 = function(## data
                xftrain, xstrain, times, delta=NULL, 
@@ -56,7 +58,11 @@ nft2 = function(## data
                a0=3, b0.a=2, b0.b=1, b0=1, b0.draw=1,
                ## misc
                na.rm=FALSE, probs=c(0.025, 0.975), printevery=100,
-               transposed=FALSE, pred=FALSE
+               transposed=FALSE, pred=FALSE,
+               ## Mehri B.M.P., add dart extension
+               sparse=FALSE, theta=0, omega=1, ##Mehri B.M.P.
+               a=0.5, b=1, augment=FALSE, rho=0, grp=NULL, ## Mehri B.M.P.
+               varprob=NULL // Mehri B.M.P.
                )
 {
     n=length(times)
@@ -246,7 +252,17 @@ nft2 = function(## data
               ##zdraws2,
               ##impute.bin,
               ##impute.prob,
-              PACKAGE="nftbart")
+              PACKAGE="nftbart",
+              ## Mehri B.M.P., add dart extension
+              sparse, ## Mehri B.M.P.
+              theta, ## Mehri B.M.P.
+              omega, ## Mehri B.M.P.
+              grp, ## Mehri B.M.P.
+              a, ## Mehri B.M.P.
+              b, ## Mehri B.M.P.
+              rho, ## Mehri B.M.P.
+              augment,## Mehri B.M.P.
+              varprob) ## Mehri B.M.P.
 
     ## res$elapsed <- (proc.time()-ptm)['elapsed']
     ## attr(res$elapsed, 'names')=NULL

@@ -465,14 +465,15 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
   ambm.setci(tau,sig);
  
   //Mehri B.M.P. addiding dart extension, line 466~478.
-  ambm.setdart(a,b,grp,aug,dart,rho); //Mehri B.M.P
+  nftdart Insnftdart; //Mehri B.M.P., Create an instance of the nftdart class
+  Insnftdart.setdart(a,b,grp,aug,dart,rho); //Mehri B.M.P
   //bm.setdart(a,b,rho,aug,dart); //Mehri B.M.P
-  ambm.setpv(&varprob[0]); //Mehri B.M.P
+  Insnftdart.setpv(&varprob[0]); //Mehri B.M.P
 
   // dart iterations, //Mehri B.M.P
   std::vector<double> ivarprb (pf,0.); //Mehri B.M.P
   std::vector<size_t> ivarcnt (pf,0); //Mehri B.M.P
-  ivarprb=ambm.getpv(); //Mehri B.M.P
+  ivarprb=Insnftdart.getpv(); //Mehri B.M.P
 //       if(verbose==1) { //Mehri B.M.P
 //     cout << "*****Variable selection probability pv[0],pv[p-1]:\n" //Mehri B.M.P
 //         << ivarprb[0] << ',' << ivarprb[pf-1] << endl; //Mehri B.M.P
@@ -581,7 +582,7 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
 	}
       }
         
-    if(i==(burn/2)&&dart) ambm.startdart(); //Mehri B.M.P. addiding dart extension
+    if(i==(burn/2)&&dart) Insnftdart.startdart(); //Mehri B.M.P. addiding dart extension
     } 
     else adapting_every=(i>0 && (i%adaptevery)==0);
 

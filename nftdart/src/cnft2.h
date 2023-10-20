@@ -48,6 +48,8 @@
 //#include "rrn.h"
 //#include "rtnorm.h"
 
+#include "nftdart.h" //Mehri B.M.P.
+
 RcppExport SEXP cnft2(   //function definition in the R programming language using Rcpp
 		     SEXP _ixftrain,
 		     SEXP _ixstrain,

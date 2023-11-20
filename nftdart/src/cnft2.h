@@ -110,6 +110,7 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
 //std::vector< std::vector<size_t> > varcnt; //Mehri B.M.P.
 //std::vector< std::vector<double> > varprb; //Mehri B.M.P.
 {
+  std::cerr << "Entering cnft2\n"; //Mehri B.M.P.
   //random number generation
 
 #if defined(RRNG)   // These lines suggest conditional compilation based on whether RRNG is defined
@@ -280,36 +281,52 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
   
   //Mehri B.M.P. addiding dart extension, line 277~292.
   bool dart;  //Mehri B.M.P.
-  if(Rcpp::as<int>(_idart)==1) dart=true; //Mehri B.M.P.
+  if(Rcpp::as<int>(_idart)==1) dart=true;//Mehri B.M.P.
   else dart=false; //Mehri B.M.P.
+    COUT << "test286" << endl;
   double a = Rcpp::as<double>(_ia); //Mehri B.M.P.
+    COUT << "test287" << endl;
   double b = Rcpp::as<double>(_ib); //Mehri B.M.P.
   //   Rcpp::NumericVector irho(_irho); //Mehri B.M.P.
   //   double *rho = &irho[0]; //Mehri B.M.P.
+    COUT << "test89" << endl;
   double rho = Rcpp::as<double>(_irho); //Mehri B.M.P.
+    COUT << "test93" << endl;
   bool aug; //Mehri B.M.P.
+    COUT << "test95" << endl;
   if(Rcpp::as<int>(_iaug)==1) aug=true; //Mehri B.M.P.
   else aug=false; //Mehri B.M.P.
+    COUT << "test298" << endl;
   Rcpp::NumericVector varprob(_varprob); //Mehri B.M.P.
+    COUT << "test300" << endl;
   double theta = Rcpp::as<double>(_itheta); //Mehri B.M.P.
+    COUT << "test302" << endl;
   double omega = Rcpp::as<double>(_iomega); //Mehri B.M.P.
+    COUT << "test304" << endl;
   Rcpp::IntegerVector _grp(_igrp); //Mehri B.M.P.
+    COUT << "test306" << endl;
+  std::cerr << "Accessing grp\n"; // Mehri B.M.P.
+    COUT << "test308" << endl;
   int *grp = &_grp[0]; //Mehri B.M.P.
-    
+    COUT << "test310" << endl;
   // return data structures, Variables for storing the results, such as dalpha, dnpart, dmu, dsig, dpC, dpMU, and dpSD, are defined.
   int ndMT=0, ndbMT=0, nMT=0;
+    COUT << "test313" << endl;
   if(drawMuTau>0) {
     ndMT=nd;
     ndbMT=(nd+burn);
     nMT=n;
   }
-  Rcpp::NumericVector dalpha(ndMT); 
+    COUT << "test319" << endl;
+  Rcpp::NumericVector dalpha(ndMT);
+    COUT << "test321" << endl;
   for(int i=0;i<ndMT;i++) dalpha[i]=0.;
   Rcpp::IntegerVector dnpart(ndbMT);
   Rcpp::NumericMatrix dmu(ndMT, nMT);
   Rcpp::NumericMatrix dsig(ndMT, nMT);
   Rcpp::IntegerMatrix dpC(ndMT, nMT);
   Rcpp::NumericMatrix dpMU(ndMT, nMT);
+    COUT << "test328" << endl;
   Rcpp::NumericMatrix dpSD(ndMT, nMT);
   //Rcpp::NumericMatrix dpWT(ndMT, nMT);
 

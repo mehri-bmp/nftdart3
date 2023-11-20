@@ -125,7 +125,10 @@ nft2 = function(## data, Function Parameters: The function nft2 takes a multitud
     
     pf=nrow(xftrain)
     ps=nrow(xstrain)
-
+    print("test_127_R")
+    if (length(varprob) == 0) varprob = double(pf) # Mehri BMP
+    if (length(grp) == 0) grp = rep(1L,pf) # Mehri BMP
+    print("test_129_R")
     take.logs = (dist!='extreme')
     if(length(events)==0 && K>0) {
         events <- unique(quantile(times, probs=(0:(K-1))/(K-1)))

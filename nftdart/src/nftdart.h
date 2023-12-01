@@ -28,14 +28,34 @@
 
 class nftdart {
 public:
-  nftdart() { } //The class has a default constructor nftdart(), which initializes the class.
-  void setdart(double _a, double _b, int *_grp, bool _aug, bool _dart,
-               double _rho=0., double _theta=0., double _omega=1.) { grp= new double[p];
+nftdart() { } //The class has a default constructor nftdart(), which initializes the class.
+//  void setdart(size_t _p, double _a, double _b, int *_grp, bool _aug, bool _dart,
+//               double _rho=0., double _theta=0., double _omega=1.) {
+//      size_t this -> p = _p;
+//      grp= new double[p];
+//      for(size_t i=0; i<p; ++i) grp[i]=_grp[i];
+//      if(_rho==0.) for(size_t i=0; i<p; ++i) _rho += 1./grp[i];
+//      this->setdart(_a, _b, _rho, _aug, _dart, _theta, _omega);} //A member function.
+//  void setdart(size_t _p, double _a, double _b, double _rho, bool _aug, bool _dart,
+//         double _theta=0., double _omega=1.) {
+//      size_t this -> p = _p;
+//      this->a=_a; this->b=_b; this->rho=_rho; this->aug=_aug;
+//      this->dart=_dart; this->omega=_omega;
+//      if(_theta==0.){
+//        this->const_theta=false;
+//        this->theta=1.;
+//      }
+//      else{
+//        this->const_theta=true;
+//        this->theta=_theta;
+//      }
+// }
+  void setdart(size_t _p, double _a, double _b, int *_grp, bool _aug, bool _dart,
+               double _rho=0., double _theta=0., double _omega=1.) {
+      this -> p = _p;
+      this -> grp= new double[p];
       for(size_t i=0; i<p; ++i) grp[i]=_grp[i];
       if(_rho==0.) for(size_t i=0; i<p; ++i) _rho += 1./grp[i];
-      this->setdart(_a, _b, _rho, _aug, _dart, _theta, _omega);} //A member function.
-  void setdart(double _a, double _b, double _rho, bool _aug, bool _dart,
-         double _theta=0., double _omega=1.) {
       this->a=_a; this->b=_b; this->rho=_rho; this->aug=_aug;
       this->dart=_dart; this->omega=_omega;
       if(_theta==0.){
@@ -57,7 +77,7 @@ public:
   //draw function
 protected:
     //Member Variables
-int p;
+size_t p;
 bool dart,dartOn,aug,const_theta;
 double a,b,rho,theta,omega;  
 double *grp;

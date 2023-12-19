@@ -62,7 +62,7 @@ nft2 = function(## data, Function Parameters: The function nft2 takes a multitud
                ## Mehri B.M.P., add dart extension
                sparse=FALSE, theta=0, omega=1, ##Mehri B.M.P.
                a=0.5, b=1, augment=FALSE, rho=0, grp=NULL, ## Mehri B.M.P.
-               varprob=NULL ## Mehri B.M.P.
+               varprob=NULL, p = NULL ## Mehri B.M.P.
                )
 {
     n=length(times)
@@ -84,19 +84,19 @@ nft2 = function(## data, Function Parameters: The function nft2 takes a multitud
             stop('The number of rows in xftest and xstest must be the same')
 
         if(np>0) {
-            xf.=bMM(rbind(xftrain, xftest), numcut=numcut, rm.const=rm.const, rm.dupe=rm.dupe,
+            xf.=bMMdart(rbind(xftrain, xftest), numcut=numcut, rm.const=rm.const, rm.dupe=rm.dupe,
                    method=method, use=use)
             xftrain=cbind(xf.$X[1:n, ])
             xftest =cbind(xf.$X[n+(1:np), ])
-            xs.=bMM(rbind(xstrain, xstest), numcut=numcut, rm.const=rm.const, rm.dupe=rm.dupe,
+            xs.=bMMdart(rbind(xstrain, xstest), numcut=numcut, rm.const=rm.const, rm.dupe=rm.dupe,
                    method=method, use=use)
             xstrain=cbind(xs.$X[1:n, ])
             xstest =cbind(xs.$X[n+(1:np), ])
         } else {
-            xf.=bMM(xftrain, numcut=numcut, rm.const=rm.const, rm.dupe=rm.dupe,
+            xf.=bMMdart(xftrain, numcut=numcut, rm.const=rm.const, rm.dupe=rm.dupe,
                    method=method, use=use)
             xftrain=xf.$X
-            xs.=bMM(xstrain, numcut=numcut, rm.const=rm.const, rm.dupe=rm.dupe,
+            xs.=bMMdart(xstrain, numcut=numcut, rm.const=rm.const, rm.dupe=rm.dupe,
                    method=method, use=use)
             xstrain=xs.$X
         }
@@ -104,7 +104,7 @@ nft2 = function(## data, Function Parameters: The function nft2 takes a multitud
         xiscuts=xs.$xicuts
         chvf = xf.$chv
         chvs = xs.$chv
-        
+        grp = xf.$grp #mehri-bmp
         impute=CDimpute(x.train=xftrain, x.test=xftest)
         xftrain=t(impute$x.train)
         xftest=t(impute$x.test)
@@ -265,6 +265,7 @@ nft2 = function(## data, Function Parameters: The function nft2 takes a multitud
               rho, ## Mehri B.M.P.
               augment,## Mehri B.M.P.
               varprob, ## Mehri B.M.P.
+              pf, ## Mehri B.M.P.
               PACKAGE="nftbart")
 
     ## res$elapsed <- (proc.time()-ptm)['elapsed']

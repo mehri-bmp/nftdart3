@@ -48,6 +48,7 @@
 //#include "rrn.h"
 //#include "rtnorm.h"
 
+#include <vector> //Mehri B.M.P.
 #include "nftdart.h" //Mehri B.M.P.
 
 RcppExport SEXP cnft2(   //function definition in the R programming language using Rcpp
@@ -104,10 +105,12 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
              SEXP _ib,            //Mehri B.M.P., param b for sparsity prior
              SEXP _irho,          //Mehri B.M.P., param rho for sparsity prior (default to p)
              SEXP _iaug,          //Mehri B.M.P., categorical strategy: true(1)=data augment false(0)=degenerate trees
-             SEXP _varprob
+                      //Mehri B.M.P
+             SEXP _varprob,//Mehri B.M.P
+             SEXP _ip//Mehri B.M.P
 		     )
 //  //Mehri B.M.P.,matrix to return dart posteriors (counts and probs)
-//std::vector< std::vector<size_t> > varcnt; //Mehri B.M.P.
+// std::vector< std::vector<size_t> > varcnt; //Mehri B.M.P.
 //std::vector< std::vector<double> > varprb; //Mehri B.M.P.
 {
   std::cerr << "Entering cnft2\n"; //Mehri B.M.P.
@@ -232,7 +235,7 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
 
   //f(x) function to be used like sig vector
   double *fun = new double[n]; 
-
+  
   //change variable
   Rcpp::NumericMatrix chvf(_ichvf), chvs(_ichvs);
   COUT << "row, cols chvf: " << chvf.nrow() << ", " << chvf.ncol() << endl;
@@ -284,6 +287,7 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
   if(Rcpp::as<int>(_idart)==1) dart=true;//Mehri B.M.P.
   else dart=false; //Mehri B.M.P.
     COUT << "test286" << endl;
+    COUT << "today: 121323" << endl;
   double a = Rcpp::as<double>(_ia); //Mehri B.M.P.
     COUT << "test287" << endl;
   double b = Rcpp::as<double>(_ib); //Mehri B.M.P.
@@ -292,13 +296,31 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
     COUT << "test89" << endl;
   double rho = Rcpp::as<double>(_irho); //Mehri B.M.P.
     COUT << "test93" << endl;
+  // size_t p = Rcpp::as<size_t>(_ip); //Mehri B.M.P.
+      COUT << "test296"<< endl;
+//  Rcpp::NumericVector ipVector = Rcpp::as<Rcpp::NumericVector>(_ip); //Mehri B.M.P.
+//  for (size_t i = 0; i < ipVector.size(); ++i) { //Mehri B.M.P.
+//        size_t p = static_cast<size_t>(ipVector[i]); //Mehri B.M.P.
+//        // Process p as needed
+//        COUT << "Value of p at index " << i << ": " << p << endl; //Mehri B.M.P.
+//  }
+  // Declaration of ipVector in the correct scope,//Mehri B.M.P.
+  Rcpp::NumericVector ipVector = Rcpp::as<Rcpp::NumericVector>(_ip); //Mehri B.M.P.
+  size_t p = 0; // Declare p outside the loop,//Mehri B.M.P.
+  for (size_t i = 0; i < ipVector.size(); ++i) { //Mehri B.M.P.
+        p = static_cast<size_t>(ipVector[i]); // Assign new value to p in each iteration,//Mehri B.M.P.
+        // Process p as needed
+        COUT << "Value of p at index " << i << ": " << p << endl; //Mehri B.M.P.
+  }
+    // Now p can be used here, holding the value from the last iteration of the loop
+
   bool aug; //Mehri B.M.P.
     COUT << "test95" << endl;
   if(Rcpp::as<int>(_iaug)==1) aug=true; //Mehri B.M.P.
   else aug=false; //Mehri B.M.P.
-    COUT << "test298" << endl;
+  COUT << "test298_121523" << endl;
   Rcpp::NumericVector varprob(_varprob); //Mehri B.M.P.
-    COUT << "test300" << endl;
+  COUT << "test300" << endl;
   double theta = Rcpp::as<double>(_itheta); //Mehri B.M.P.
     COUT << "test302" << endl;
   double omega = Rcpp::as<double>(_iomega); //Mehri B.M.P.
@@ -416,7 +438,7 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
   //Mehri B.M.P. addiding dart extension, line 398~400.
   cout << "*****Dirichlet:sparse,theta,omega,rho,a,b,augment,grp[0],grp[p-1]:\n"
          << dart << ',' << theta << ',' << omega << ',' << rho << ',' << a << ',' //Mehri B.M.P.
-         << b << ',' << aug << ',' << grp[0] << ',' << grp[pf-1] << endl; //Mehri B.M.P.
+         << b << ',' << aug << ',' << grp[0] << ',' << grp[pf-1] <<  endl; //Mehri B.M.P.
     
 
   //--------------------------------------------------
@@ -440,7 +462,11 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
       COUT << xis[i][0] << " ... " << xis[i][xis[i].size()-1] << endl;
     }
 
+  COUT << "Loop comple " << endl; // Mehri-BMP
+
   for(size_t i=0;i<n;i++) { //Initialization of Variables: It initializes various variables like z, w, and censor.
+    COUT << "Initialization of variables - test" << endl; // Mehri-BMP
+    COUT << "print n = " << n << ' ' << i << endl; // Mehri-BMP
     z[i]=y[i]; // initialize z
     w[i]=1.;   // initialize w
     censor[i] = 1-delta[i]; // -1 left, 0 event, 1 right
@@ -450,7 +476,7 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
       Xt(impute_bin, i)=gen.bin(1, impute_prior[i]);
 */
   }
-
+    COUT << "Loop completed :)" << endl; // Mehri-BMP
   //--------------------------------------------------
   //dinfo, dinfo Object Creation: A dinfo object di is created and initialized with relevant data.
   dinfo di;
@@ -483,7 +509,8 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
  
   //Mehri B.M.P. addiding dart extension, line 466~478.
   nftdart Insnftdart; //Mehri B.M.P., Create an instance of the nftdart class
-  Insnftdart.setdart(a,b,grp,aug,dart,rho); //Mehri B.M.P
+  //Insnftdart.setdart(a,b,grp,aug,dart,rho); //Mehri B.M.P
+  Insnftdart.setdart(p,a,b,grp,aug,dart,rho); //Mehri B.M.P
   //bm.setdart(a,b,rho,aug,dart); //Mehri B.M.P
   Insnftdart.setpv(&varprob[0]); //Mehri B.M.P
 

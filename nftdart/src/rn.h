@@ -1,7 +1,8 @@
 /*
  * Copyright (C) 2012-2021 Matthew T. Pratola, Robert E. McCulloch,
  *                         Hugh A. Chipman and Rodney A. Sparapani
- *  
+ * Copyright (C) 2023 Mehri BagheriMohmadiPour (ONLY FOR THE LINES MARKED AS "mehri-bmp")
+ *
  * This file is part of nftbart.
  * rn.h
  *
@@ -23,6 +24,7 @@
  * Robert E. McCulloch: robert.e.mculloch@gmail.com
  * Hugh A. Chipman: hughchipman@gmail.com
  * Rodney A. Sparapani: rsparapa@mcw.edu
+ * Mehri Bagheri-Mohamadi-Pour: mehri@uwm.edu
  *
  */
 
@@ -49,39 +51,45 @@
 #ifndef NotInR
 #include <Rcpp.h>
 //#include <RcppEigen.h>
-#define COUT Rcpp::Rcout 
-#define cout Rcpp::Rcout 
+#define COUT Rcpp::Rcout
+#define cout Rcpp::Rcout
 #else
-#define COUT std::cout 
+#define COUT std::cout
 using std::cout;
 #endif
 
 using std::endl;
 const double Inf=1./0.;
 
+double log_sum_exp(std::vector<double>& v); //mehri-bmp
+
 //pure virtual base class for random numbers
 class rn
 {
 public:
    virtual double normal() = 0; //standard normal
-   virtual double normal(double mu, double sd) = 0; 
+   virtual double normal(double mu, double sd) = 0;
    virtual double uniform() = 0; //uniform(0,1)
    virtual double chi_square(double _df) = 0;
    virtual double chi_square() = 0; //chi-square
    virtual void set_df(int df) = 0; //set df for chi-square
-   virtual double exp() = 0; 
-   virtual double log_gamma(double shape) = 0; 
+   virtual double exp() = 0;
+   virtual double log_gamma(double shape) = 0;
    virtual double gamma(double shape, double rate=1., double small=0.1) = 0;
-   virtual double gamma() = 0; 
+   virtual double gamma() = 0;
    virtual void set_alpha(double alpha) = 0; //set df gamma
    virtual int rcat(Rcpp::NumericVector prob) = 0;
    //virtual int rcat(Eigen::VectorXd prob) = 0;
    virtual int bin(int n, double p) = 0;
    virtual double beta(double a, double b) = 0;
-   virtual double rtnorm(double tau, double mu=0., double sd=1.) = 0; 
+   virtual double rtnorm(double tau, double mu=0., double sd=1.) = 0;
 // virtual double weibull(double shape, double scale) = 0;
 // virtual double rnormt(double a, double b) = 0;
 // virtual double rnormt(double a, double b, double mu, double sd) = 0;
+   virtual size_t discrete() = 0; //discrete (categorical) distribution,mehri-bmp
+   virtual size_t geometric(double p) = 0; //geometric distribution, mehri-bmp
+   virtual void set_wts(std::vector<double>& _wts) = 0; //mehri-bmp
+   virtual std::vector<double> log_dirichlet(std::vector<double>& alpha) = 0; //mehri-bmp
    virtual ~rn() {}
 };
 
@@ -94,7 +102,7 @@ class rrn: public rn
   //virtual
   virtual ~rrn() {}
   virtual double normal() {return R::norm_rand();}
-  virtual double normal(double mu, double sd) 
+  virtual double normal(double mu, double sd)
   {return mu+sd*R::norm_rand();}
   virtual double uniform() {return R::unif_rand();}
   virtual double chi_square(double _df) {return R::rchisq(_df);}
@@ -103,28 +111,28 @@ class rrn: public rn
   virtual double exp() {return R::exp_rand();}
   virtual double log_gamma(double shape) {
     double y=log(R::rgamma(shape+1., 1.)), z=log(this->uniform())/shape;
-    return y+z; 
+    return y+z;
   }
 
 /*
   virtual double gamma(double shape, double rate) {
     if(shape<0.01) return ::exp(this->log_gamma(shape))/rate;
-    else return R::rgamma(shape, 1.)/rate; 
-  } 
+    else return R::rgamma(shape, 1.)/rate;
+  }
 */
 
     virtual double gamma(double shape, double rate=1., double small=0.1) {
       if(shape<=small) {
-	double z;
-	do { z=::exp(this->log_gamma(shape)-log(rate)); } while (z==0.);
-	//do { z=::exp(this->log_gamma(shape))/rate; } while (z==0.);
-	return z;
+    double z;
+    do { z=::exp(this->log_gamma(shape)-log(rate)); } while (z==0.);
+    //do { z=::exp(this->log_gamma(shape))/rate; } while (z==0.);
+    return z;
       }
-      else return R::rgamma(shape, 1.)/rate; 
-    } 
+      else return R::rgamma(shape, 1.)/rate;
+    }
 
   virtual double gamma() {return this->gamma(alpha, 1.);}
-  virtual void set_alpha(double _alpha) {this->alpha=_alpha;} 
+  virtual void set_alpha(double _alpha) {this->alpha=_alpha;}
   int get_df() {return df;}
   double get_alpha() {return alpha;}
 
@@ -137,23 +145,23 @@ class rrn: public rn
 /*
       if(c==0. || d<0.) {
 //#ifdef DEBUG
-	cout << "rcat returning -1\n";
-	cout << _p << '\n';
+    cout << "rcat returning -1\n";
+    cout << _p << '\n';
 //#endif
-	return -1;
-	}
+    return -1;
+    }
 */
       Rcpp::IntegerVector x(K);
       R::rmultinom(1, &p[0], K, &x[0]);
       if(Rcpp::sum(x)!=1) {
-	for(int j=0; j<K; ++j) p[j]=1./K;
-	R::rmultinom(1, &p[0], K, &x[0]);
+    for(int j=0; j<K; ++j) p[j]=1./K;
+    R::rmultinom(1, &p[0], K, &x[0]);
       }
       for(int j=0; j<K; ++j) if(x[j]==1) return j;
 //#ifdef DEBUG
-	cout << "rcat returning -1\n";
-	cout << "p: " << _p << '\n';
-	cout << "x: " << x << '\n';
+    cout << "rcat returning -1\n";
+    cout << "p: " << _p << '\n';
+    cout << "x: " << x << '\n';
 //#endif
       return -1;
     }
@@ -176,8 +184,8 @@ class rrn: public rn
   }
 */
 
-  virtual int bin(int n, double p) {return R::rbinom(n, p);} 
-  virtual double beta(double a, double b) {return R::rbeta(a, b);} 
+  virtual int bin(int n, double p) {return R::rbinom(n, p);}
+  virtual double beta(double a, double b) {return R::rbeta(a, b);}
 
     virtual double rtnorm(double tau, double mean=0., double sd=1.) {
       double x, z, lambda;
@@ -185,16 +193,16 @@ class rrn: public rn
       tau = (tau - mean)/sd;
 
       if(tau<=0.) {
-	/* draw until we get to the right of tau */
-	do { z=this->normal(); } while (z < tau);
+    /* draw until we get to the right of tau */
+    do { z=this->normal(); } while (z < tau);
       }
       else {
-	/* optimal exponential rate parameter */
-	lambda = 0.5*(tau + sqrt(pow(tau, 2.) + 4.));
+    /* optimal exponential rate parameter */
+    lambda = 0.5*(tau + sqrt(pow(tau, 2.) + 4.));
 
-	/* rejection sampling */
-	do { z = this->exp()/lambda + tau; } 
-	while (this->uniform() > ::exp(-0.5*pow(z - lambda, 2.)));
+    /* rejection sampling */
+    do { z = this->exp()/lambda + tau; }
+    while (this->uniform() > ::exp(-0.5*pow(z - lambda, 2.)));
       }
 
       /* put x back on the right scale */
@@ -202,42 +210,69 @@ class rrn: public rn
 
       return(x);
     }
-//virtual double weibull(double shape, double scale) 
+//virtual double weibull(double shape, double scale)
 //  {return scale*pow(-R::log(unif_rand()), 1./shape);}
 /*
   virtual double rnormt(double a, double b) {
-    double L=R::pnorm(a, 0., 1., 1, 0), R=R::pnorm(b, 0., 1., 1, 0), 
+    double L=R::pnorm(a, 0., 1., 1, 0), R=R::pnorm(b, 0., 1., 1, 0),
       U=R::unif_rand();
     return R::qnorm(L+U*(R-L), 0., 1., 1, 0);}
   virtual double rnormt(double a, double b, double mu, double sd)
   {return mu+sd*rnormt((a-mu)/sd, (b-mu)/sd);}
-*/
+*/  
+    virtual size_t geometric(double p) {return R::rgeom(p);} //mehri-bmp
+    virtual void set_wts(std::vector<double>& _wts) { //mehri-bmp
+    double smw=0.;
+    wts.clear();
+    for(size_t j=0;j<_wts.size();j++) smw+=_wts[j];
+    for(size_t j=0;j<_wts.size();j++) wts.push_back(_wts[j]/smw);
+    }
+    virtual size_t discrete() { //mehri-bmp
+    size_t p=wts.size(), x=0;
+    std::vector<int> vOut (p,0);
+    R::rmultinom(1,&wts[0],p,&vOut[0]);
+    if(vOut[0]==0) for(size_t j=1;j<p;j++) x += j*vOut[j];
+    return x;
+    }
+    virtual std::vector<double> log_dirichlet(std::vector<double>& alpha){ //mehri-bmp
+        size_t k=alpha.size();
+        std::vector<double> draw(k);
+        double lse;
+        for(size_t j=0;j<k;j++) draw[j]=this->log_gamma(alpha[j]);
+        lse=log_sum_exp(draw);
+        for(size_t j=0;j<k;j++) {
+          draw[j] -= lse;
+          //draw[j]=::exp(draw[j]);
+        }
+        return draw;
+      }
  private:
   //std::vector<double> wts;
   Rcpp::RNGScope RNGstate;
   int df;
   double alpha;
+  std::vector<double> wts; //mehri-bmp
 };
 
 /*
-void DPMLIOneal7(SEXP _y, SEXP _phi, SEXP _C, SEXP _S, 
-		 SEXP _prior, SEXP _hyper, rn &gen,
-		 double (*F)(double y, double mu, double tau),
-		 double (*G0tau)(double a0, double b0, rn &gen),
-		 double (*G0mu)(double tau, double m0, double k0, rn &gen),
-		 void (*P0)(size_t c_row, SEXP _Y, SEXP _phi, 
-			    double m0, double k0, double a0, double b0, 
-			    rn &gen));
+void DPMLIOneal7(SEXP _y, SEXP _phi, SEXP _C, SEXP _S,
+         SEXP _prior, SEXP _hyper, rn &gen,
+         double (*F)(double y, double mu, double tau),
+         double (*G0tau)(double a0, double b0, rn &gen),
+         double (*G0mu)(double tau, double m0, double k0, rn &gen),
+         void (*P0)(size_t c_row, SEXP _Y, SEXP _phi,
+                double m0, double k0, double a0, double b0,
+                rn &gen));
 */
 
-void DPMLIOneal8(SEXP _y, SEXP _phi, SEXP _C, SEXP _S, 
-		 SEXP _prior, SEXP _hyper, rn &gen,
-		 double (*F)(double y, double mu, double tau),
-		 double (*G0tau)(double a0, double b0, rn &gen),
-		 double (*G0mu)(double tau, double m0, double k0, rn &gen),
-		 void (*P0)(size_t c_row, SEXP _Y, SEXP _phi, 
-			    double m0, double k0, double a0, double b0, 
-			    rn &gen));
+void DPMLIOneal8(SEXP _y, SEXP _phi, SEXP _C, SEXP _S,
+         SEXP _prior, SEXP _hyper, rn &gen,
+         double (*F)(double y, double mu, double tau),
+         double (*G0tau)(double a0, double b0, rn &gen),
+         double (*G0mu)(double tau, double m0, double k0, rn &gen),
+         void (*P0)(size_t c_row, SEXP _Y, SEXP _phi,
+                double m0, double k0, double a0, double b0,
+                rn &gen));
 
 double DPMLIOmutau_F(double y, double mu, double tau);
 
@@ -245,23 +280,23 @@ double DPMLIOmutau_G0tau(double a0, double b0, rn &gen);
 
 double DPMLIOmutau_G0mu(double tau, double m0, double k0, rn &gen);
 
-void DPMLIOmutau_P0(size_t row_c, SEXP _Y, SEXP _phi, 
-		    double m0, double k0, double a0, double b0, rn &gen);
+void DPMLIOmutau_P0(size_t row_c, SEXP _Y, SEXP _phi,
+            double m0, double k0, double a0, double b0, rn &gen);
 
 /*
-void DPMtauneal8(SEXP _y, SEXP _phi, SEXP _C, SEXP _S, 
-		 SEXP _prior, SEXP _hyper, rn &gen,
-		 double (*F)(double y, double tau),
-		 double (*G0)(double a0, double b0, rn &gen),
-		 void (*P0)(size_t c_row, SEXP _Y, SEXP _phi, 
-			    double a0, double b0, rn &gen));
+void DPMtauneal8(SEXP _y, SEXP _phi, SEXP _C, SEXP _S,
+         SEXP _prior, SEXP _hyper, rn &gen,
+         double (*F)(double y, double tau),
+         double (*G0)(double a0, double b0, rn &gen),
+         void (*P0)(size_t c_row, SEXP _Y, SEXP _phi,
+                double a0, double b0, rn &gen));
 
 double DPMtau_F(double y, double tau);
 
 double DPMtau_G0(double a0, double b0, rn &gen);
 
-void DPMtau_P0(size_t row_c, SEXP _Y, SEXP _phi, 
-		    double a0, double b0, rn &gen);
+void DPMtau_P0(size_t row_c, SEXP _Y, SEXP _phi,
+            double a0, double b0, rn &gen);
 */
 
 #endif

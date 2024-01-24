@@ -1,7 +1,8 @@
 /*
  * Copyright (C) 2012-2021 Matthew T. Pratola, Robert E. McCulloch,
  *                         and Hugh A. Chipman
- *  
+ * Copyright (C) 2023 Mehri BagheriMohmadiPour (ONLY FOR THE LINES MARKED AS "mehri-bmp")
+ *
  * This file is part of nftbart.
  * brt.h
  *
@@ -22,11 +23,14 @@
  * Matthew T. Pratola: mpratola@gmail.com
  * Robert E. McCulloch: robert.e.mculloch@gmail.com
  * Hugh A. Chipman: hughchipman@gmail.com
+ * Mehri Bagheri-Mohamadi-Pour: mehri@uwm.edu
  *
  */
 
 #ifndef GUARD_brt_h
 #define GUARD_brt_h
+
+#include "nftdart.h" //mehri-bmp
 
 /*
 #include "tree.h"
@@ -39,6 +43,7 @@
 
 #include "brt.h"
 #include "brtfuns.h"
+#include "nftdart.h"
 #include <iostream>
 #include <map>
 #include <vector>
@@ -200,6 +205,12 @@ protected:
    dinfo *di; //n,p,x,y
    std::vector<double> yhat; //the predicted vector
    std::vector<double> resid; //the actual residual vector
+   bool dart,dartOn,aug,const_theta; //mehri-bmp
+   double a,b,rho,theta,omega, //mehri-bmp
+        accept; // MH acceptance rate from most recent draw //mehri-bmp
+   double *grp; //mehri-bmp
+   std::vector<size_t> nv; //mehri-bmp
+   std::vector<double> pv, lpv; //mehri-bmp
    //--------------------
    //mcmc info
    mcmcinfo mi;
@@ -293,7 +304,7 @@ void brt::draw(rn& gen)
    // Gibbs Step
     drawtheta(gen);
 
-   //update statistics
+   //update statistics, mehri-bmp: doing overal, 
    if(mi.dostats) {
       tree::npv bnv; //all the bottom nodes
       for(size_t k=0;k< xi->size();k++) mi.varcount[k]+=t.nuse(k);
@@ -310,6 +321,12 @@ void brt::draw(rn& gen)
       }
       mi.tavgd+=((double)tempavgdepth)/((double)bnv.size());
    }
+    if(dartOn) { //mehri-bmp
+         if(grp) draw_s_grp(nv,lpv,theta,gen,grp,rho);
+         else draw_s(nv,lpv,theta,gen);
+         draw_theta0(const_theta,theta,lpv,a,b,rho,gen);
+         //for(size_t j=0;j<p;j++) pv[j]=::exp(lpv[j]);
+       }
 }
 //--------------------------------------------------
 //adapt the proposal widths for perturb proposals,

@@ -157,7 +157,7 @@ public:
    //void addstats(unsigned int* vc, double* tad, unsigned int* tmd, unsigned int* tid) { *tad+=mi.tavgd; *tmd=std::max(*tmd,mi.tmaxd); *tid=std::min(*tid,mi.tmind); for(size_t i=0;i<xi->size();i++) vc[i]+=mi.varcount[i]; }
    void resetstats() { mi.tavgd=0.0; mi.tmaxd=0; mi.tmind=0; for(size_t i=0;i<xi->size();i++) mi.varcount[i]=0; }
    void setci() {}
-   void draw(rn& gen);
+   void draw(double sigma, rn& gen); // mehri-bmp
    virtual sinfo* newsinfo() { return new sinfo; }
    virtual std::vector<sinfo*>& newsinfovec() { std::vector<sinfo*>* si= new std::vector<sinfo*>; return *si; }
    virtual std::vector<sinfo*>& newsinfovec(size_t dim) { std::vector<sinfo*>* si = new std::vector<sinfo*>; si->resize(dim); for(size_t i=0;i<dim;i++) si->push_back(new sinfo); return *si; }
@@ -185,7 +185,7 @@ public:
    tree t;
    //--------------------------------------------------
    //stuff that maybe should be protected
-   void bd(rn& gen);      //uses getsuff
+   void bd(std::vector<size_t>& nv, std::vector<double>& pv, bool aug, rn& gen);      //uses getsuff
    void pertcv(rn& gen);  //uses getpertsuff which in turn uses subsuff
    void drawtheta(rn& gen);
    void allsuff(tree::npv& bnv,std::vector<sinfo*>& siv);  //assumes brt.t is the root node
@@ -194,6 +194,19 @@ public:
    bool rot(tree::tree_p tnew, tree& x, rn& gen);  //uses subsuff
    void adapt();
 protected:
+   //mehri-bmp: added declarations for identifiers
+   size_t m;  //number of trees, mehri-bmp
+   // std::vector<tree> t; //the trees,mehri-bmp
+   // pinfo pi; //prior and mcmc info,mehri-bmp
+   //data,mehri-bmp
+   size_t p,n; //x has dim p, n obserations,mehri-bmp
+   double *x,*y;  //x is column stack, pxn,mehri-bmp
+    //working,mehri-bmp
+   double *allfit; //if the data is set, should be f(x),mehri-bmp
+   double *ftemp; //mehri-bmp
+   // double *r; //mehri-bmp
+
+
    //--------------------
    //model information
    tprior tp; //prior on tree (alpha and beta)
@@ -285,11 +298,24 @@ std::stringstream brt::gettrees(size_t nd, size_t m, std::vector<int>& nn,
 
 //--------------------------------------------------
 //a single iteration of the MCMC for brt model
-void brt::draw(rn& gen)
+void brt::draw(double sigma, rn& gen) // mehri-bmp
 {
    // Structural/topological proposal(s)
    if(gen.uniform()<mi.pbd)
-      bd(gen);
+   {
+       size_t i=0;
+       for(size_t j=0;j<m;j++) {
+          fit(t[j],xi,p,n,x,ftemp);
+          for(size_t k=0;k<n;k++) {
+             allfit[k] = allfit[k]-ftemp[k];
+             r[k] = y[k]-allfit[k];
+          }
+          if(bd(t[j],xi,di,pi,sigma,nv,pv,aug,gen)) i++;
+          drmu(t[j],xi,di,pi,sigma,gen);
+          fit(t[j],xi,p,n,x,ftemp);
+          for(size_t k=0;k<n;k++) allfit[k] += ftemp[k];
+       }
+   }
    else
    {
       tree::tree_p tnew;
@@ -328,6 +354,7 @@ void brt::draw(rn& gen)
          //for(size_t j=0;j<p;j++) pv[j]=::exp(lpv[j]);
        }
 }
+
 //--------------------------------------------------
 //adapt the proposal widths for perturb proposals,
 //bd or rot proposals and b or d proposals.
@@ -948,7 +975,7 @@ void brt::local_loadtree(size_t iter, int beg, int end, std::vector<int>& nn, st
 //--------------------------------------------------
 //--------------------------------------------------
 //bd: birth/death
-void brt::bd(rn& gen)
+void brt::bd(std::vector<size_t>& nv, std::vector<double>& pv, bool aug, rn& gen) // mehri-bmp changed function signature
 {
 //   COUT << "--------------->>into bd" << endl;
    tree::npv goodbots;  //nodes we could birth at (split on)
@@ -961,8 +988,9 @@ void brt::bd(rn& gen)
       tree::tree_p nx; //bottom node
       size_t v,c; //variable and cutpoint
       double pr; //part of metropolis ratio from proposal and prior
-      bprop(t,*xi,tp,mi.pb,goodbots,PBx,nx,v,c,pr,gen);
-
+//      bprop(t,*xi,tp,mi.pb,goodbots,PBx,nx,v,c,pr,gen); // mehri-bmp match function signature for dirichlet
+      bprop(t, *xi, tp, mi.pb, goodbots, PBx, nx, v, c, pr, nv, pv, aug, gen); // mehri-bmp
+       
       //--------------------------------------------------
       //compute sufficient statistics
       sinfo& sil = *newsinfo();

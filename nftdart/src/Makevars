@@ -1,6 +1,7 @@
 
 CXX_STD = CXX14
-PKG_CPPFLAGS = -fopenmp
-PKG_LIBS = -fopenmp
-##PKG_LIBS = -fopenmp -lprofiler
+PKG_CXXFLAGS = -Xlinker -lomp -Xclang -fopenmp
+PKG_LIBS = -Xlinker -lomp -Xclang -fopenmp
+##PKG_LIBS = -lomp
+##PKG_LIBS = -Xlinker -lomp -Xclang -fopenmp -lprofiler
 

@@ -58,7 +58,8 @@ double getpb(tree& t, xinfo& xi, double pipb, tree::npv& goodbots); //mehri-bmp:
 //double getpb(tree& t, xinfo& xi, pinfo& pi, tree::npv& goodbots); //mehri-bmp
 //--------------------------------------------------
 //bprop: function to generate birth proposal
-void bprop(tree& x, xinfo& xi, brt::tprior& tp, double pb, tree::npv& goodbots, double& PBx, tree::tree_p& nx, size_t& v, size_t& c, double& pr, rn& gen);
+//void bprop(tree& x, xinfo& xi, brt::tprior& tp, double pb, tree::npv& goodbots, double& PBx, tree::tree_p& nx, size_t& v, size_t& c, double& pr, rn& gen); // mehri-bmp changed function signature
+void bprop(tree& x, xinfo& xi, brt::tprior& tp, double pb, tree::npv& goodbots, double& PBx, tree::tree_p& nx, size_t& v, size_t& c, double& pr, std::vector<size_t>& nv, std::vector<double>& pv, bool aug, rn& gen);
 //--------------------------------------------------
 // death proposal
 void dprop(tree& x, xinfo& xi, brt::tprior& tp, double pb, tree::npv& goodbots, double& PBx, tree::tree_p& nx, double& pr, rn& gen);
@@ -170,29 +171,115 @@ double getpb(tree& t, xinfo& xi, double pipb, tree::npv& goodbots) //mehri-bmp:r
 }
 //--------------------------------------------------
 //bprop: function to generate birth proposal
-void bprop(tree& x, xinfo& xi, brt::tprior& tp, double pb, tree::npv& goodbots, double& PBx, tree::tree_p& nx, size_t& v, size_t& c, double& pr, rn& gen) //mehri-bmp:removed
+/*void bprop(tree& x, xinfo& xi, brt::tprior& tp, doubfle pb, tree::npv& goodbots, double& PBx, tree::tree_p& nx, size_t& v, size_t& c, double& pr, rn& gen)*/ //mehri-bmp:removed
+
+void bprop(tree& x, xinfo& xi, brt::tprior& tp, double pb, tree::npv& goodbots, double& PBx, tree::tree_p& nx, size_t& v, size_t& c, double& pr, std::vector<size_t>& nv, std::vector<double>& pv, bool aug, rn& gen)
+
 
 //void bprop(tree& x, xinfo& xi, brt::tprior& tp, double pb, tree::npv& goodbots, double& PBx, tree::tree_p& nx, size_t& v, size_t& c, double& pr, rn& gen,
           // double pipb, std::vector<size_t>& nv, std::vector<double>& pv, bool aug) //mehri-bmp:added pinfo& pi, std::vector<size_t>& nv, std::vector<double>& pv, and bool aug.
 
 {
+// removed this part of the function // mehri-bmp
+//      //mehri-bmp:removed these line
+//      //draw bottom node, choose node index ni from list in goodbots
+//      size_t ni = floor(gen.uniform()*goodbots.size());
+//      nx = goodbots[ni]; //the bottom node we might birth at
+//
+//      //draw v,  the variable
+//      std::vector<size_t> goodvars; //variables nx can split on
+//      getgoodvars(nx,xi,goodvars);
+//      size_t vi = floor(gen.uniform()*goodvars.size()); //index of chosen split variable
+//      v = goodvars[vi];
+//
+//      //draw c, the cutpoint
+//      int L,U;
+//      L=0; U = xi[v].size()-1;
+//      nx->rg(v,&L,&U);
+//      c = L + floor(gen.uniform()*(U-L+1)); //U-L+1 is number of available split points
 
-    //mehri-bmp:removed these line
-      //draw bottom node, choose node index ni from list in goodbots
-      size_t ni = floor(gen.uniform()*goodbots.size());
-      nx = goodbots[ni]; //the bottom node we might birth at
+    // Dirichlet functions mehri-bmp
+    //draw bottom node, choose node index ni from list in goodbots
+    size_t ni = floor(gen.uniform()*goodbots.size());
+    nx = goodbots[ni]; //the bottom node we might birth at
 
-      //draw v,  the variable
-      std::vector<size_t> goodvars; //variables nx can split on
+    //draw v,  the variable
+    std::vector<size_t> goodvars; //variables nx can split on
+    int L,U; //for cutpoint draw
+    // Degenerate Trees Strategy (Assumption 2.2)
+    if(!aug){
       getgoodvars(nx,xi,goodvars);
-      size_t vi = floor(gen.uniform()*goodvars.size()); //index of chosen split variable
-      v = goodvars[vi];
+      gen.set_wts(pv);
+      v = gen.discrete();
+      L=0; U=xi[v].size()-1;
+      if(!std::binary_search(goodvars.begin(),goodvars.end(),v)){ // if variable is bad
+        c=nx->getbadcut(v); // set cutpoint of node to be same as next highest interior node with same variable
+      }
+      else{ // if variable is good
+        nx->rg(v,&L,&U);
+        c = L + floor(gen.uniform()*(U-L+1)); // draw cutpoint usual way
+      }
+    }
 
-      //draw c, the cutpoint
-      int L,U;
-      L=0; U = xi[v].size()-1;
-      nx->rg(v,&L,&U);
-      c = L + floor(gen.uniform()*(U-L+1)); //U-L+1 is number of available split points
+    // Modified Data Augmentation Strategy (Mod. Assumption 2.1)
+    // Set c_j = s_j*E[G] = s_j/P{picking a good var}
+    // where  G ~ Geom( P{picking a good var} )
+    else{
+      std::vector<size_t> allvars; //all variables
+      std::vector<size_t> badvars; //variables nx can NOT split on
+      std::vector<double> pgoodvars; //vector of goodvars probabilities (from S, our Dirichlet vector draw)
+      std::vector<double> pbadvars; //vector of badvars probabilities (from S,...)
+      getgoodvars(nx,xi,goodvars);
+      //size_t ngoodvars=goodvars.size();
+      size_t nbadvars=0; //number of bad vars
+      double smpgoodvars=0.; //P(picking a good var)
+      double smpbadvars=0.; //P(picking a bad var)
+      //size_t nbaddraws=0; //number of draws at a particular node
+      //this loop fills out badvars, pgoodvars, pbadvars,
+      //there may be a better way to do this...
+      for(size_t j=0;j<pv.size();j++){
+        allvars.push_back(j);
+        if(goodvars[j-nbadvars]!=j) {
+          badvars.push_back(j);
+          pbadvars.push_back(pv[j]);
+          smpbadvars+=pv[j];
+          nbadvars++;
+        }
+        else {
+          pgoodvars.push_back(pv[j]);
+          smpgoodvars+=pv[j];
+        }
+      }
+  
+      //set the weights for variable draw and draw a good variable
+      gen.set_wts(pgoodvars);
+      v = goodvars[gen.discrete()];
+      if(nbadvars!=0){ // if we have bad vars then we need to augment, otherwise we skip
+        //gen.set_p(smpgoodvars); // set parameter for G
+        //nbaddraws=gen.geometric(); // draw G = g ~ Geom
+        // for each bad variable, set its c_j equal to its expected count
+        /*
+         gen.set_wts(pbadvars);
+         for(size_t k=0;k!=nbaddraws;k++) {
+           nv[badvars[gen.discrete()]]++;
+          }
+        */
+        for(size_t j=0;j<nbadvars;j++)
+          nv[badvars[j]]=nv[badvars[j]]+(1/smpgoodvars)*(pv[badvars[j]]/smpbadvars);
+        }
+/*
+    size_t vi = floor(gen.uniform()*goodvars.size()); //index of chosen split variable
+    v = goodvars[vi];
+*/
+
+        //draw c, the cutpoint
+        //int L,U;
+        L=0; U = xi[v].size()-1;
+        nx->rg(v,&L,&U);
+        c = L + floor(gen.uniform()*(U-L+1)); //U-L+1 is number of available split points
+    }
+    
+    
 //    //mehri-added the following line by metropolis ratio
 //    //draw bottom node, choose node index ni from list in goodbots
 //          size_t ni = floor(gen.uniform()*goodbots.size());

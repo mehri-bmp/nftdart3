@@ -1,3 +1,3 @@
 install:
-	./nftdart/cleanup
+	cd nftdart && ./cleanup & cd ..
 	./install_debug

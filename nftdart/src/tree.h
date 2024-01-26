@@ -118,6 +118,7 @@ public:
    size_t depth();  //depth of a node
    char ntype(); //node type t:top, b:bot, n:no grandchildren i:interior (t can be b)
    bool isnog();
+   size_t getbadcut(size_t v); // mehri-bmp add function
    bool isleft() const;
    bool isright() const;
    //these are in public right now so brt::rot compiles
@@ -736,4 +737,13 @@ void tree::deathp(tree_p nb, double theta)
    nb->c=0;
    nb->theta=theta;
 }
+
+size_t tree::getbadcut(size_t v){ // mehri-bmp add function
+  tree_p par=this->getp();
+  if(par->getv()==v)
+    return par->getc();
+  else
+    return par->getbadcut(v);
+}
+
 #endif

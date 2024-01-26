@@ -286,8 +286,9 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
   bool dart;  //Mehri B.M.P.
   if(Rcpp::as<int>(_idart)==1) dart=true;//Mehri B.M.P.
   else dart=false; //Mehri B.M.P.
+    COUT << "today: 121923" << endl;
     COUT << "test286" << endl;
-    COUT << "today: 121323" << endl;
+    // COUT << "today: 121323" << endl;
   double a = Rcpp::as<double>(_ia); //Mehri B.M.P.
     COUT << "test287" << endl;
   double b = Rcpp::as<double>(_ib); //Mehri B.M.P.
@@ -318,7 +319,7 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
     COUT << "test95" << endl;
   if(Rcpp::as<int>(_iaug)==1) aug=true; //Mehri B.M.P.
   else aug=false; //Mehri B.M.P.
-  COUT << "test298_121523" << endl;
+  // COUT << "test298_121523" << endl;
   Rcpp::NumericVector varprob(_varprob); //Mehri B.M.P.
   COUT << "test300" << endl;
   double theta = Rcpp::as<double>(_itheta); //Mehri B.M.P.

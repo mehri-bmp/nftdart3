@@ -1,0 +1,4 @@
+#!/bin/sh
+
+R CMD INSTALL -l /Users/mehribmp/Library/R/dev/arm64/4.3/library --dsym nftdart
+

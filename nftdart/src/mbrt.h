@@ -123,7 +123,8 @@ protected:
 void mbrt::draw(rn& gen)
 {
    //All the usual steps
-   brt::draw(gen);
+   brt::draw(gen); //mehri-bmp:removed
+   // brt::draw(sigma,gen); //mehri-bmp
 
    // Update the in-sample predicted vector
    setf();

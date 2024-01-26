@@ -31,6 +31,7 @@
 #define GUARD_brt_h
 
 #include "nftdart.h" //mehri-bmp
+#include "tree.h" //mehri-bmp
 
 /*
 #include "tree.h"
@@ -157,7 +158,8 @@ public:
    //void addstats(unsigned int* vc, double* tad, unsigned int* tmd, unsigned int* tid) { *tad+=mi.tavgd; *tmd=std::max(*tmd,mi.tmaxd); *tid=std::min(*tid,mi.tmind); for(size_t i=0;i<xi->size();i++) vc[i]+=mi.varcount[i]; }
    void resetstats() { mi.tavgd=0.0; mi.tmaxd=0; mi.tmind=0; for(size_t i=0;i<xi->size();i++) mi.varcount[i]=0; }
    void setci() {}
-   void draw(double sigma, rn& gen); // mehri-bmp
+   // void draw(double sigma, rn& gen); // mehri-bmp
+   void draw(rn& gen); // mehri-bmp
    virtual sinfo* newsinfo() { return new sinfo; }
    virtual std::vector<sinfo*>& newsinfovec() { std::vector<sinfo*>* si= new std::vector<sinfo*>; return *si; }
    virtual std::vector<sinfo*>& newsinfovec(size_t dim) { std::vector<sinfo*>* si = new std::vector<sinfo*>; si->resize(dim); for(size_t i=0;i<dim;i++) si->push_back(new sinfo); return *si; }
@@ -185,7 +187,8 @@ public:
    tree t;
    //--------------------------------------------------
    //stuff that maybe should be protected
-   void bd(std::vector<size_t>& nv, std::vector<double>& pv, bool aug, rn& gen);      //uses getsuff
+   // void bd(std::vector<size_t>& nv, std::vector<double>& pv, bool aug, rn& gen);      //uses getsuff
+   void bd(rn& gen);      //uses getsuff
    void pertcv(rn& gen);  //uses getpertsuff which in turn uses subsuff
    void drawtheta(rn& gen);
    void allsuff(tree::npv& bnv,std::vector<sinfo*>& siv);  //assumes brt.t is the root node
@@ -298,24 +301,26 @@ std::stringstream brt::gettrees(size_t nd, size_t m, std::vector<int>& nn,
 
 //--------------------------------------------------
 //a single iteration of the MCMC for brt model
-void brt::draw(double sigma, rn& gen) // mehri-bmp
+// void brt::draw(double sigma, rn& gen) // mehri-bmp
+void brt::draw(rn& gen) // mehri-bmp
 {
    // Structural/topological proposal(s)
    if(gen.uniform()<mi.pbd)
-   {
-       size_t i=0;
-       for(size_t j=0;j<m;j++) {
-          fit(t[j],xi,p,n,x,ftemp);
-          for(size_t k=0;k<n;k++) {
-             allfit[k] = allfit[k]-ftemp[k];
-             r[k] = y[k]-allfit[k];
-          }
-          if(bd(t[j],xi,di,pi,sigma,nv,pv,aug,gen)) i++;
-          drmu(t[j],xi,di,pi,sigma,gen);
-          fit(t[j],xi,p,n,x,ftemp);
-          for(size_t k=0;k<n;k++) allfit[k] += ftemp[k];
-       }
-   }
+      bd(gen);
+   // {
+   //     size_t i=0;
+   //     for(size_t j=0;j<m;j++) {
+   //        fit(t[j],xi,p,n,x,ftemp);
+   //        for(size_t k=0;k<n;k++) {
+   //           allfit[k] = allfit[k]-ftemp[k];
+   //           r[k] = y[k]-allfit[k];
+   //        }
+   //        if(bd(t[j],xi,di,pi,sigma,nv,pv,aug,gen)) i++;
+   //        drmu(t[j],xi,di,pi,sigma,gen);
+   //        fit(t[j],xi,p,n,x,ftemp);
+   //        for(size_t k=0;k<n;k++) allfit[k] += ftemp[k];
+   //     }
+   
    else
    {
       tree::tree_p tnew;
@@ -975,7 +980,8 @@ void brt::local_loadtree(size_t iter, int beg, int end, std::vector<int>& nn, st
 //--------------------------------------------------
 //--------------------------------------------------
 //bd: birth/death
-void brt::bd(std::vector<size_t>& nv, std::vector<double>& pv, bool aug, rn& gen) // mehri-bmp changed function signature
+// void brt::bd(std::vector<size_t>& nv, std::vector<double>& pv, bool aug, rn& gen) // mehri-bmp changed function signature
+void brt::bd(rn& gen)
 {
 //   COUT << "--------------->>into bd" << endl;
    tree::npv goodbots;  //nodes we could birth at (split on)

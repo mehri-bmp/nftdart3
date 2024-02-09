@@ -286,19 +286,19 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
   bool dart;  //Mehri B.M.P.
   if(Rcpp::as<int>(_idart)==1) dart=true;//Mehri B.M.P.
   else dart=false; //Mehri B.M.P.
-    COUT << "today: 121923" << endl;
-    COUT << "test286" << endl;
+    // COUT << "today: 121923" << endl;
+    // COUT << "test286" << endl;
     // COUT << "today: 121323" << endl;
   double a = Rcpp::as<double>(_ia); //Mehri B.M.P.
-    COUT << "test287" << endl;
+    // COUT << "test287" << endl;
   double b = Rcpp::as<double>(_ib); //Mehri B.M.P.
   //   Rcpp::NumericVector irho(_irho); //Mehri B.M.P.
   //   double *rho = &irho[0]; //Mehri B.M.P.
-    COUT << "test89" << endl;
+    // COUT << "test89" << endl;
   double rho = Rcpp::as<double>(_irho); //Mehri B.M.P.
-    COUT << "test93" << endl;
+    // COUT << "test93" << endl;
   // size_t p = Rcpp::as<size_t>(_ip); //Mehri B.M.P.
-      COUT << "test296"<< endl;
+      // COUT << "test296"<< endl;
 //  Rcpp::NumericVector ipVector = Rcpp::as<Rcpp::NumericVector>(_ip); //Mehri B.M.P.
 //  for (size_t i = 0; i < ipVector.size(); ++i) { //Mehri B.M.P.
 //        size_t p = static_cast<size_t>(ipVector[i]); //Mehri B.M.P.
@@ -316,40 +316,40 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
     // Now p can be used here, holding the value from the last iteration of the loop
 
   bool aug; //Mehri B.M.P.
-    COUT << "test95" << endl;
+    // COUT << "test95" << endl;
   if(Rcpp::as<int>(_iaug)==1) aug=true; //Mehri B.M.P.
   else aug=false; //Mehri B.M.P.
   // COUT << "test298_121523" << endl;
   Rcpp::NumericVector varprob(_varprob); //Mehri B.M.P.
-  COUT << "test300" << endl;
+  // COUT << "test300" << endl;
   double theta = Rcpp::as<double>(_itheta); //Mehri B.M.P.
-    COUT << "test302" << endl;
+    // COUT << "test302" << endl;
   double omega = Rcpp::as<double>(_iomega); //Mehri B.M.P.
-    COUT << "test304" << endl;
+    // COUT << "test304" << endl;
   Rcpp::IntegerVector _grp(_igrp); //Mehri B.M.P.
-    COUT << "test306" << endl;
+    // COUT << "test306" << endl;
   std::cerr << "Accessing grp\n"; // Mehri B.M.P.
-    COUT << "test308" << endl;
+    // COUT << "test308" << endl;
   int *grp = &_grp[0]; //Mehri B.M.P.
-    COUT << "test310" << endl;
+    // COUT << "test310" << endl;
   // return data structures, Variables for storing the results, such as dalpha, dnpart, dmu, dsig, dpC, dpMU, and dpSD, are defined.
   int ndMT=0, ndbMT=0, nMT=0;
-    COUT << "test313" << endl;
+    // COUT << "test313" << endl;
   if(drawMuTau>0) {
     ndMT=nd;
     ndbMT=(nd+burn);
     nMT=n;
   }
-    COUT << "test319" << endl;
+    // COUT << "test319" << endl;
   Rcpp::NumericVector dalpha(ndMT);
-    COUT << "test321" << endl;
+    // COUT << "test321" << endl;
   for(int i=0;i<ndMT;i++) dalpha[i]=0.;
   Rcpp::IntegerVector dnpart(ndbMT);
   Rcpp::NumericMatrix dmu(ndMT, nMT);
   Rcpp::NumericMatrix dsig(ndMT, nMT);
   Rcpp::IntegerMatrix dpC(ndMT, nMT);
   Rcpp::NumericMatrix dpMU(ndMT, nMT);
-    COUT << "test328" << endl;
+    // COUT << "test328" << endl;
   Rcpp::NumericMatrix dpSD(ndMT, nMT);
   //Rcpp::NumericMatrix dpWT(ndMT, nMT);
 
@@ -463,10 +463,10 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
       COUT << xis[i][0] << " ... " << xis[i][xis[i].size()-1] << endl;
     }
 
-  COUT << "Loop comple " << endl; // Mehri-BMP
+  COUT << "the loop complited " << endl; // Mehri-BMP
 
   for(size_t i=0;i<n;i++) { //Initialization of Variables: It initializes various variables like z, w, and censor.
-    COUT << "Initialization of variables - test" << endl; // Mehri-BMP
+    // COUT << "Initialization of variables - test" << endl; // Mehri-BMP
     COUT << "print n = " << n << ' ' << i << endl; // Mehri-BMP
     z[i]=y[i]; // initialize z
     w[i]=1.;   // initialize w
@@ -477,7 +477,7 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
       Xt(impute_bin, i)=gen.bin(1, impute_prior[i]);
 */
   }
-    COUT << "Loop completed :)" << endl; // Mehri-BMP
+    COUT << "the loop completed :)" << endl; // Mehri-BMP
   //--------------------------------------------------
   //dinfo, dinfo Object Creation: A dinfo object di is created and initialized with relevant data.
   dinfo di;
@@ -599,16 +599,20 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
   Rprintf("Starting MCMC...\n");
   //Initialization: Some variables like adapting, burning, keeping, and drawDP are initialized. These variables control different phases of the MCMC algorithm, such as adaptation, burning, and data imputation.
   bool adapting=true, burning=false, keeping=false, adapting_every, drawDP=false;
+  // Rprintf("passed 601");
 //, draw_s=true; 
 #ifdef PROFILER 
   ProfilerStart(PROFILER);
+  Rprintf("passed 605");
 #endif
   //MCMC Loop: The core of the MCMC algorithm is in the for loop, which runs for a specified number of iterations (M). Inside the loop, the code performs different operations depending on whether it's in the adaptation phase, burning phase, or keeping phase. The code also handles data imputation, including censoring and random draws. Updating Parameters: The code updates various parameters such as z[k], sig[k], mvec[k], and phi(C[k], 0) based on the current state and the MCMC sampling process. These parameters are essential for Bayesian inference. MCMC Sampling: The code uses random number generation functions (e.g., gen.normal) to sample from probability distributions. This is a fundamental aspect of MCMC, where random samples are drawn to estimate posterior distributions. Data Imputation: The code appears to be imputing data or estimating missing values. This is a common task in Bayesian analysis, where incomplete data is estimated using the observed data and the model.Constraining Parameters: There's a section that seems to constrain parameters, which is often done in Bayesian analysis to ensure certain properties or priors on parameters. Updating Count of Partitions: The code updates the count of partitions (dnpart[h]), which could be related to the number of clusters or groups in the data. Other Operations: The code includes some commented-out sections that might be part of the larger program but are currently inactive.
+    
   for(size_t h, i=0, j, L=nadapt+burn, M=L+nd; i<M; i++) {
+      Rprintf("in the loop %d", M); //mehri-bmp
     adapting=(i<nadapt);
     h=i-nadapt;
     j=i-L;
-
+    // Rprintf("in the loop 2"); //mehri-bmp
     if(!adapting) {
       adapting_every=false;
       burning=(i<L); 
@@ -630,11 +634,11 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
     if(i==(burn/2)&&dart) Insnftdart.startdart(); //Mehri B.M.P. addiding dart extension
     } 
     else adapting_every=(i>0 && (i%adaptevery)==0);
-
+    // Rprintf("in the loop 3"); //mehri-bmp
     if(adapting_every) {
       COUT << "adapting  " << i << endl;
     }
-
+      // Rprintf("in the loop 4"); //mehri-bmp
     size_t K=Rcpp::max(C)+1;
     int g;
     for(size_t k=0;k<n;k++) {
@@ -649,6 +653,7 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
 	  g=gen.rcat(prob);
 	  if(g==-1) g=C[k];
 	}
+        // Rprintf("in the loop 5"); //mehri-bmp
       if(delta[k]==1) {
 	z[k] = y[k];
 /*
@@ -659,6 +664,7 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
 */
       }
       else {
+          // Rprintf("in the loop 6"); //mehri-bmp
 	if(drawDP) {
 	  // right and left censoring
 /*
@@ -675,6 +681,7 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
 		       pow(phi(g, 1), -0.5)*sig[k]);
 	}
 	else {
+        // Rprintf("in the loop 7"); //mehri-bmp
 /*
 	  if(drawrho && !adapting)
 	    z[k]=censor[k]*
@@ -699,13 +706,14 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
 	if(drawrho) sig[k] *= pow(1.-pow(rho, 2.), 0.5);
       }
 */
+        // Rprintf("in the loop 8"); //mehri-bmp
       if(keeping) {
 	if(drawDP) zdraws(j, k)=gen.normal(phi(g, 0)*sig[k]+ambm.f(k), 
 					   pow(phi(g, 1), -0.5)*sig[k]);
 	else zdraws(j, k)=gen.normal(ambm.f(k), sig[k]);
       }
     }
-
+    
     for(size_t k=0;k<n;k++) {
       if(drawDP) {
 	z[k] = z[k]-mvec[k]*sig[k];
@@ -869,6 +877,7 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
       }
     } 
   }
+ Rprintf("passed2 the loop"); //mehri-bmp
 
 #ifdef PROFILER  // Some conditional preprocessor directives, such as checking for the presence of the PROFILER macro and using ProfilerStop() if it's defined.
   ProfilerStop();

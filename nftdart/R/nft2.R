@@ -60,7 +60,7 @@ nft2 = function(## data, Function Parameters: The function nft2 takes a multitud
                na.rm=FALSE, probs=c(0.025, 0.975), printevery=100,
                transposed=FALSE, pred=FALSE,
                ## Mehri B.M.P., add dart extension
-               sparse=FALSE, theta=0, omega=1, ##Mehri B.M.P.
+               sparse=TRUE, theta=0, omega=1, ##Mehri B.M.P.
                a=0.5, b=1, augment=FALSE, rho=0, grp=NULL, ## Mehri B.M.P.
                varprob=NULL, p = NULL ## Mehri B.M.P.
                )
@@ -125,10 +125,10 @@ nft2 = function(## data, Function Parameters: The function nft2 takes a multitud
     
     pf=nrow(xftrain)
     ps=nrow(xstrain)
-    print("test_127_R")
+    # print("test_127_R")
     if (length(varprob) == 0) varprob = double(pf) # Mehri BMP
     if (length(grp) == 0) grp = rep(1L,pf) # Mehri BMP
-    print("test_129_R")
+    # print("test_129_R")
     take.logs = (dist!='extreme')
     if(length(events)==0 && K>0) {
         events <- unique(quantile(times, probs=(0:(K-1))/(K-1)))

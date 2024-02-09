@@ -220,20 +220,29 @@ class rrn: public rn
   virtual double rnormt(double a, double b, double mu, double sd)
   {return mu+sd*rnormt((a-mu)/sd, (b-mu)/sd);}
 */  
-    virtual size_t geometric(double p) {return R::rgeom(p);} //mehri-bmp
-    virtual void set_wts(std::vector<double>& _wts) { //mehri-bmp
+    
+    virtual size_t discrete() { //mehri-bmp
+    size_t p=wts.size(), x=0;
+    if (p == 0) return x; // Ensure wts is not empty to avoid undefined behavior with &wts[0], mehri-bmp
+    
+    std::vector<int> vOut (p,0);
+    R::rmultinom(1,&wts[0],p,&vOut[0]); 
+    if(vOut[0]==0) { //mehri-bmp
+      for(size_t j=1;j<p;j++) {
+        if (j < vOut.size()) { // Extra check to avoid out-of-bounds access, mehri-bmp
+            x += j*vOut[j]; 
+        }
+      }
+    }
+    return x;
+  }
+  virtual size_t geometric(double p) {return R::rgeom(p);} //mehri-bmp
+  virtual void set_wts(std::vector<double>& _wts) {
     double smw=0.;
     wts.clear();
     for(size_t j=0;j<_wts.size();j++) smw+=_wts[j];
     for(size_t j=0;j<_wts.size();j++) wts.push_back(_wts[j]/smw);
-    }
-    virtual size_t discrete() { //mehri-bmp
-    size_t p=wts.size(), x=0;
-    std::vector<int> vOut (p,0);
-    R::rmultinom(1,&wts[0],p,&vOut[0]);
-    if(vOut[0]==0) for(size_t j=1;j<p;j++) x += j*vOut[j];
-    return x;
-    }
+  }
     virtual std::vector<double> log_dirichlet(std::vector<double>& alpha){ //mehri-bmp
         size_t k=alpha.size();
         std::vector<double> draw(k);

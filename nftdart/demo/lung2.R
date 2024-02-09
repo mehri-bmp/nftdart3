@@ -1,5 +1,5 @@
 
-library(nftbart, lib.loc="/Users/mehribmp/Library/R/dev/arm64/4.3/library")
+library(nftbart, lib.loc="/Users/mehribmp/Library/R/dev/arm64/4.3/library") # mehri-bmp
 
 
 B=8 ## Setting the number of CPU cores for parallel processing to 8 (B=8).

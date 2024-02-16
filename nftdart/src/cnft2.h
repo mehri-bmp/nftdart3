@@ -463,11 +463,11 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
       COUT << xis[i][0] << " ... " << xis[i][xis[i].size()-1] << endl;
     }
 
-  COUT << "the loop complited " << endl; // Mehri-BMP
+  // COUT << "the loop complited " << endl; // Mehri-BMP
 
   for(size_t i=0;i<n;i++) { //Initialization of Variables: It initializes various variables like z, w, and censor.
     // COUT << "Initialization of variables - test" << endl; // Mehri-BMP
-    COUT << "print n = " << n << ' ' << i << endl; // Mehri-BMP
+    // COUT << "print n = " << n << ' ' << i << endl; // Mehri-BMP
     z[i]=y[i]; // initialize z
     w[i]=1.;   // initialize w
     censor[i] = 1-delta[i]; // -1 left, 0 event, 1 right
@@ -477,7 +477,7 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
       Xt(impute_bin, i)=gen.bin(1, impute_prior[i]);
 */
   }
-    COUT << "the loop completed :)" << endl; // Mehri-BMP
+    // COUT << "the loop completed :)" << endl; // Mehri-BMP
   //--------------------------------------------------
   //dinfo, dinfo Object Creation: A dinfo object di is created and initialized with relevant data.
   dinfo di;
@@ -603,12 +603,12 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
 //, draw_s=true; 
 #ifdef PROFILER 
   ProfilerStart(PROFILER);
-  Rprintf("passed 605");
+ // Rprintf("passed 605");
 #endif
   //MCMC Loop: The core of the MCMC algorithm is in the for loop, which runs for a specified number of iterations (M). Inside the loop, the code performs different operations depending on whether it's in the adaptation phase, burning phase, or keeping phase. The code also handles data imputation, including censoring and random draws. Updating Parameters: The code updates various parameters such as z[k], sig[k], mvec[k], and phi(C[k], 0) based on the current state and the MCMC sampling process. These parameters are essential for Bayesian inference. MCMC Sampling: The code uses random number generation functions (e.g., gen.normal) to sample from probability distributions. This is a fundamental aspect of MCMC, where random samples are drawn to estimate posterior distributions. Data Imputation: The code appears to be imputing data or estimating missing values. This is a common task in Bayesian analysis, where incomplete data is estimated using the observed data and the model.Constraining Parameters: There's a section that seems to constrain parameters, which is often done in Bayesian analysis to ensure certain properties or priors on parameters. Updating Count of Partitions: The code updates the count of partitions (dnpart[h]), which could be related to the number of clusters or groups in the data. Other Operations: The code includes some commented-out sections that might be part of the larger program but are currently inactive.
     
   for(size_t h, i=0, j, L=nadapt+burn, M=L+nd; i<M; i++) {
-      Rprintf("in the loop %d", M); //mehri-bmp
+      //Rprintf("in the loop %d", M); //mehri-bmp
     adapting=(i<nadapt);
     h=i-nadapt;
     j=i-L;
@@ -877,7 +877,7 @@ RcppExport SEXP cnft2(   //function definition in the R programming language usi
       }
     } 
   }
- Rprintf("passed2 the loop"); //mehri-bmp
+ // Rprintf("passed2 the loop"); //mehri-bmp
 
 #ifdef PROFILER  // Some conditional preprocessor directives, such as checking for the presence of the PROFILER macro and using ProfilerStop() if it's defined.
   ProfilerStop();

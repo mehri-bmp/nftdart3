@@ -22,8 +22,16 @@ times=times/7  ## weeks
 x.train=cbind(lung[ , -(1:3)])
 ## lung$sex:        Male=1 Female=2
 
+## mehri-bmp, adding 50 coloumns of noise to the input to test dart 
+# New step: Generate 50 columns of random uniform noise and add to x.train 
+set.seed(10) # Setting seed for reproducibility 
+x.noise <- matrix(runif(N * 50), nrow = N, ncol = 50) # Generate noise matrix 
+for(i in 1:ncol(x.noise)) { 
+x.train <- cbind(x.train, x.noise[, i]) # Add each column of noise to x.train 
+} 
+
 set.seed(99)
-post=nft2(x.train, x.train, times, delta, K=0)
+post=nft2(x.train, x.train, times, delta, K=0, sparse=FALSE) ##mehri-bmp: added sparse=TRUE
 
 x.test = rbind(x.train, x.train)
 x.test[ , 2]=rep(1:2, each=N)
@@ -32,6 +40,7 @@ events=c(0, quantile(times[delta==1], (0:(K-1))/(K-1)))
 a=proc.time()
 pred = predict(post, x.test, x.test, K=K, events=events[-1],
                XPtr=TRUE, FPD=TRUE)
+               
 print((proc.time()-a)/60)
 
 plot(events, c(1, pred$surv.fpd.mean[1:K]), type='l', col=4,

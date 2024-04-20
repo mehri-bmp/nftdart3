@@ -60,7 +60,7 @@ nft2 = function(## data, Function Parameters: The function nft2 takes a multitud
                na.rm=FALSE, probs=c(0.025, 0.975), printevery=100,
                transposed=FALSE, pred=FALSE,
                ## Mehri B.M.P., add dart extension
-               sparse=FALSE, theta=0, omega=1, ##Mehri B.M.P.
+               sparse=FALSE, theta=1, omega=1, ##Mehri B.M.P. also changed theta to 1 to prevent randon.
                a=0.5, b=1, augment=FALSE, rho=0, grp=NULL, ## Mehri B.M.P.
                varprob=NULL, p = NULL ## Mehri B.M.P.
                )

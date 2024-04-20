@@ -51,7 +51,7 @@ nftdart() { } //The class has a default constructor nftdart(), which initializes
 //      }
 // }
   void setdart(size_t _p, double _a, double _b, int *_grp, bool _aug, bool _dart,
-               double _rho=0., double _theta=0., double _omega=1.) {
+               double _rho=0., double _theta=1., double _omega=1.) {
       this -> p = _p;
       this -> grp= new double[p];
       for(size_t i=0; i<p; ++i) grp[i]=_grp[i];

@@ -1,3 +1,0 @@
-useDynLib('LIOBART', .registration=TRUE)
-##exportPattern("^[[:alpha:]]+")
-export(liobart)

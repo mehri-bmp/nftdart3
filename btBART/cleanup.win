@@ -1,4 +1,0 @@
-#!/bin/sh
-
-rm -rf src/Makevars.win src/TAGS src/BROWSE 
-
